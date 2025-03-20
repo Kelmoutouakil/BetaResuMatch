@@ -35,7 +35,10 @@ def Upload(request):
         return JsonResponse({'status':'success'})
     return JsonResponse({'error': 'No file uploaded'}, status=400)
     
-# @api_view(['POST'])
-# def JDupload(request):
-#     data = json.loads(request.body)
-    
+@api_view(['POST'])
+def JDupload(request):
+    data = json.loads(request.body)
+    if not data.get('job_description'):
+        return JsonResponse({'error':'job describtion not uploaded'}, status=400)
+    print("data : ",data.get('job_description'),flush=True)
+    return JsonResponse({'status':'success'})

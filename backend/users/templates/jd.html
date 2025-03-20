@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
     <button id="submit">submit</button>
 </body>
 <script>
-   let crftoken;
+     let crftoken;
     fetch("http://127.0.0.1:9000/user/getcsrf/",{
         method: 'GET'
     })
@@ -21,12 +21,18 @@
     .catch((error)=>{
         console.log(error)
     })
+
     document.getElementById("submit").addEventListener("click",()=>{
-        fetch("http://127.0.0.1:9000/user/getcsrf/",{
-        method: 'POST'
+        fetch("http://127.0.0.1:9000/api/JDupload/",{
+        method: 'POST',
+        headers: {
+            'content-type':'application/json',
+            'X-CSRFToken' : crftoken
+        },
+        body: JSON.stringify({"job_description" : document.getElementById("jd").value})
     })
     .then((response)=>response.json())
-    .then((data)=>{ crftoken = data.crfToken;
+    .then((data)=>{ console.log(data);
         
     })
     .catch((error)=>{
@@ -34,4 +40,4 @@
     })
     })
 </script>
-</html> -->
+</html>

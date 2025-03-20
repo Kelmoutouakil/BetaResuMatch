@@ -1,0 +1,9 @@
+PyPDF2
+pytesseract
+#python-docx
+pillow
+python-dotenv
+google-generativeai
+pinecone
+sentence-transformers
+

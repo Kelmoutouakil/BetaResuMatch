@@ -9,20 +9,20 @@ from src.embeddings.resume_embedder import get_cv_embedding
 from src.embeddings.job_embedder import get_jd_embedding
 from src.job_matching.matcher import rank_candidates
 from src.embeddings.storing import store_cv_embedding, store_jd_embedding
+from scripts.clear_pinecone import clear_pinecone_index
 
 def main():
+    clear_pinecone_index()
     resume_paths = [
         r"C:\Users\hp\Downloads\BetaResuMatch\data\ELBACHA_IKRAM_CV__Copy_.pdf",
         r"C:\Users\hp\Downloads\BetaResuMatch\data\rajaa.pdf",
-        r"C:\Users\hp\Downloads\BetaResuMatch\data\Yakhou_Yousra___QRT.pdf",
         r"C:\Users\hp\Downloads\BetaResuMatch\data\Zineb-EL-BACHA-BCG.pdf"
     ]
 
     job_description="""
     We are seeking a Machine Learning Engineer to join our AI research team.
     In this role, you will develop, deploy, and optimize machine learning models 
-    to solve real-world problems. You will work closely with data scientists and 
-    software engineers to bring AI-driven solutions to production.
+    to solve real-world problems.
 
     **Responsibilities:**
     - Design, build, and deploy machine learning models.
@@ -33,7 +33,6 @@ def main():
     **Required Skills:**
     - Python, TensorFlow, PyTorch, Scikit-Learn.
     - Experience with data engineering tools (Spark, Kafka, SQL).
-    - Familiarity with cloud platforms (AWS, GCP, Azure).
     """
     for resume_path in resume_paths:
         try:
@@ -48,7 +47,7 @@ def main():
             else:
                 print(f"Failed to embed resume: {resume_path}")
 
-            time.sleep(1)  # Prevent rate limits
+            time.sleep(3)  # Prevent rate limits
 
         except Exception as e:
             print(f"Error processing resume {resume_path}: {e}")
@@ -60,7 +59,7 @@ def main():
     job_id = "ML_Engineer_Job"  # used a fixed string but can be an id as well
     store_jd_embedding(job_id, jd_embedding)
     #matching and ranking
-    ranked_candidates = rank_candidates(jd_embedding)
+    ranked_candidates = rank_candidates(jd_embedding, exclude_id=job_id)
 
     if ranked_candidates:
         for rank, candidate in enumerate(ranked_candidates, start=1):

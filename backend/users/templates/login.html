@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="myform">
+        <input name="email" placeholder="email" />
+        <input name="password" placeholder="password" />
+        <button type="submit">submit</button>
+    </form>
+</body>
+<script>
+     let crftoken;
+    fetch("http://127.0.0.1:9000/user/getcsrf/",{
+        method: 'GET'
+    })
+    .then((response)=>response.json())
+    .then((data)=>{ crftoken = data.crfToken;
+        
+    })
+    .catch((error)=>{
+        console.log(error)
+    })
+    document.getElementById("myform").addEventListener("submit",(event)=>{
+        event.preventDefault();
+        formData = new FormData(document.getElementById("myform"));
+        let mydict = {}
+        formData.forEach((value, key) => {
+            mydict[key] = value;
+        });
+        fetch("http://127.0.0.1:9000/api/token/",{
+            method : "POST",
+            headers : {
+                'content-type':'application/json',
+                'X-CSRFToken' : crftoken
+            },
+            body : JSON.stringify(mydict)
+        })
+        .then((response) => response.json())
+        .then((data)=> {
+            console.log(data);
+        })
+        .catch((error)=>{
+            console.log(error);
+        })
+    })
+</script>
+</html>

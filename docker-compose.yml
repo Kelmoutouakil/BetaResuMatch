@@ -1,0 +1,13 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my_app
+    env_file: .env
+    ports:
+      - "9000:8000"
+      - "5432:5432"
+    volumes:
+      - ./backend:/backend

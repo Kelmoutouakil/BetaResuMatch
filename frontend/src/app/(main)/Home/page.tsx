@@ -28,14 +28,8 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col w-full">
       <nav className="w-full py-6 px-8 md:px-16 flex justify-between items-center">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center">
-            <span className="text-white text-xl">β</span>
-          </div>
-          <span className="text-black font-bold text-xl">Ask Beta AI</span>
-        </div>
       </nav>
       <main className="flex-1 flex flex-col items-center justify-center px-6">
         <div className="w-32 h-32 md:w-40 md:h-40 mb-12 flex items-center justify-center">

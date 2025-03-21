@@ -1,5 +1,5 @@
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
-
+import { IoIosLogOut } from "react-icons/io";
 import {
   Sidebar,
   SidebarContent,
@@ -56,7 +56,12 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  Welcome User
+                <div className="flex items-center space-x-3">
+          <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
+            <span className="text-white text-xl">β</span>
+          </div>
+          <span className="text-black font-bold text-xl">Ask Beta AI</span>
+        </div>
                   {/* <ChevronDown className="ml-auto" /> */}
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -95,7 +100,9 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>Logout</SidebarMenuButton>
+                <SidebarMenuButton>Logout
+                <IoIosLogOut />
+                </SidebarMenuButton>
               </DropdownMenuTrigger>
               {/* <DropdownMenuContent
                 side="top"

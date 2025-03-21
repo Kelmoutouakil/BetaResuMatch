@@ -150,3 +150,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
+# CORS Settings
+CORS_ALLOW_ALL_ORIGINS = False  # Set to True if you want to allow all origins (for testing only)
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Allow your frontend
+    "http://127.0.0.1:3000",  # Alternative localhost
+]
+CORS_ALLOW_CREDENTIALS = True  # If you're using authentication with cookies or tokens
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+CORS_ALLOW_HEADERS = ["*"]  # Allow all headers

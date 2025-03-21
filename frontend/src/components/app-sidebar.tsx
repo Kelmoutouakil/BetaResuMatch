@@ -50,7 +50,7 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar className="bg-transparent">
-      <SidebarHeader className="bg-[#3F788A]">
+      <SidebarHeader className="bg-[#3F788A52]">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -86,7 +86,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span className="ml-2 text-lg font-semibold">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -99,11 +99,14 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>Logout
-                <IoIosLogOut />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
+                <div className="ml-2 text-lg font-semibold flex flex-col w-full items-start justify-center">
+                  {/* <SidebarMenuButton > */}
+                <a href={"/"} className="flex flex-row items-center justify-center">
+                      <IoIosLogOut />
+                      <span className="ml-4 text-lg font-semibold">Logout</span>
+                    </a>
+                    {/* <SidebarMenuButton /> */}
+                </div>
               {/* <DropdownMenuContent
                 side="top"
                 className="w-[--radix-popper-anchor-width]"

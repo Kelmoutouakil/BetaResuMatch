@@ -1,6 +1,6 @@
 "use client"; // Ensure this component is client-side
 
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 
 export default function SidebarLayout({
@@ -9,11 +9,16 @@ export default function SidebarLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex h-screen w-full">
-    <SidebarProvider>
-          <AppSidebar /> 
-          {children} 
-    </SidebarProvider>
+    <div className="flex min-h-screen w-full overflow-hidden">
+      <SidebarProvider>
+        <AppSidebar />
+        <main className="flex-1 overflow-auto">
+          <div className="p-4">
+            <SidebarTrigger className="mb-4" />
+            {children}
+          </div>
+        </main>
+      </SidebarProvider>
     </div>
   );
 }

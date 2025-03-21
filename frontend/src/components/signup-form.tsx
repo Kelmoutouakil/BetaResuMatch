@@ -52,7 +52,7 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="shadow-input mx-auto w-full max-w-md rounded-none p-4 md:rounded-2xl md:p-8 dark:bg-[#3F788A]">
+    <div className="shadow-input mx-auto w-full max-w-md rounded-none p-4 md:rounded-2xl md:p-8 dark:bg-[#3F788A8F]">
       <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
         Welcome to Beta Hiring AI
       </h2>

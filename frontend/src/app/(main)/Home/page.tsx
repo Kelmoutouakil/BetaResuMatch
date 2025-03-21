@@ -1,31 +1,41 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
-import Link from "next/link";
+import Loader from "@/components/Loader";
 import { Search, Upload, ArrowRight } from "lucide-react";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 export default function SearchPage() {
+  // const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Submitted query:", searchQuery);
+    sendQuery(searchQuery);
   };
-  const [files, setFiles] = useState<FileList | null>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setFiles(event.target.files);
-      console.log([...event.target.files]);
+  const sendQuery = async (query: string) => {
+    try {
+      const res = await axios.post(
+        " http://127.0.0.1:9000/api/JDupload/",
+        searchQuery,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      // router.push("/");
+    } catch(err: any) {
+      setError(err.response?.data?.message || "Something went wrong!");
+    }
+    finally {
+      setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex flex-col w-full">
@@ -51,18 +61,6 @@ export default function SearchPage() {
 
         <form onSubmit={handleSubmit} className="w-full max-w-3xl">
           <div className="relative">
-            {/* <div className="absolute left-4 top-1/2 -translate-y-1/2">
-              <label className=" cursor-pointer">
-                <Upload className="w-5 h-5 text-white/50" />
-                <input
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-              </label>
-            </div> */}
-
             <input
               type="text"
               value={searchQuery}
@@ -75,7 +73,9 @@ export default function SearchPage() {
               type="submit"
               className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#89A8B2] rounded-full flex items-center justify-center hover:bg-opacity-90 transition-colors"
             >
-              <ArrowRight className="w-5 h-5 text-white" />
+              {/* {loading ? ( */}
+            {/* // <ArrowRight className="w-5 h-5 text-white" /> ) : (<Loader />)} */}
+               <ArrowRight className="w-5 h-5 text-white" />
             </button>
           </div>
         </form>

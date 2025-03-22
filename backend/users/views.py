@@ -34,6 +34,7 @@ def CreateUser(request):
 def PostFile(request):
     return render(request,'login.html')
 def pdfinput(request):
+    # return render(request,'pdfinput.html')
     return render(request,'jd.html')
 def Postregister(request):
     return render(request,'register.html')

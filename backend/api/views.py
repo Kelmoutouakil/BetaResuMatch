@@ -18,16 +18,15 @@ def Upload(request):
         uploaded_files = request.FILES.getlist('files[]')
         saved_files = []
         for file in uploaded_files:
+            print("-----------",file.name,flush=True)
             filename, ext = os.path.splitext(file.name)
             if ext.lower() not in ALLOWED_EXTENSIONS:
                 return JsonResponse({'error': f'Invalid file type: {ext}'}, status=400)
             resume = Resume(user=request.user)
             resume.save()
-            candidat_id = resume.id
-            new_filename = f"{filename}_{candidat_id}{ext}"
+            new_filename = f"{filename}_{resume.id}{ext}"
             saved_path = default_storage.save(new_filename, ContentFile(file.read()))
             full_file_path =  default_storage.path(saved_path)
-            
             resume.file = full_file_path
             resume.save()
             saved_files.append({
@@ -49,6 +48,7 @@ def JDupload(request):
         resumes = Resume.objects.filter(user=user)
         print("Number of resumes fetched:", resumes.count(), flush=True)  
         for resume in resumes:
+            print(resume.file.path,"-----------------",flush=True)
             parsed_resume = Parse_resume(extract_text(resume.file.path))
             print(".....", parsed_resume, flush=True)  
             resume.name = parsed_resume.get('name')  

@@ -1,12 +1,12 @@
 from PyPDF2 import PdfReader
+from sklearn.metrics.pairwise import cosine_similarity
 from huggingface_hub import InferenceClient
-from PIL import Image
-import pytesseract
 import google.generativeai as genai
 import json
 import os, re, time
 from .pinecone_integr import embedding_model, index
 import uuid
+from users.models import Resume
 repo_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 client = InferenceClient(model=repo_id, token=os.getenv('HUGGINGFACE_API_KEY'))
 def extract_text(file_path):
@@ -16,11 +16,6 @@ def extract_text(file_path):
         for page in reader.pages:
             text += page.extract_text()
         return text
-    # elif file_path.endswitch(('.png', '.jpg', '.jpeg')):
-    #     image = Image.open(file_path)
-    #     text = pytesseract.image_to_string(image)
-    #     print("----text : ",text, flush=True)
-    #     return text
     else:
         raise ValueError("Unsupport file format")
  
@@ -255,9 +250,9 @@ def summarize_text(text):
     response = client.text_generation(prompt)
     return response
 
-def rank_candidates(jd_embedding, exclude_id=None):
+def rank_candidates(jd_embedding, exclude_id=None,n=10):
     """
-    Retrieve the top matching candidates from Pinecone and rank them.
+    Retrieve and rank all candidates, even those with no match (score 0), from Pinecone.
     Exclude a specific ID (e.g., the job description itself).
 
     Parameters:
@@ -265,26 +260,29 @@ def rank_candidates(jd_embedding, exclude_id=None):
         exclude_id (str): ID to exclude from ranking (e.g., job description ID).
 
     Returns:
-        list: Ranked candidates with similarity scores.
+        list: Ranked candidates with similarity scores (including 0 for non-matches).
     """
     try:
         # Query Pinecone for similar embeddings
         results = index.query(
             vector=jd_embedding.tolist(),
-            top_k=10,
-            include_values=True
+            top_k=n,
+            include_values=True,
+            include_metadata=True 
         )
 
-        # Filter out the excluded ID (e.g., job description)
         ranked_candidates = []
         for match in results['matches']:
-            if match['id'] != exclude_id:  # Exclude the job description
-                similarity_percentage = round(match['score'] * 100, 2)  # Convert score to percentage
+            if match['id'] != exclude_id:
+                similarity_score = match.get('score', 0)  
+                similarity_percentage = round(similarity_score * 100, 2)  
+                resume = Resume.objects.get(id=match['id'])  # Query for resume by ID
+                resume.score = similarity_percentage  # Update the score
+                resume.save()
                 ranked_candidates.append({
                     "candidate_id": match['id'],
-                    "similarity_score": similarity_percentage  # Keep as numerical value for sorting
+                    "similarity_score": similarity_percentage  
                 })
-
         # Sort candidates by similarity score in descending order
         ranked_candidates = sorted(
             ranked_candidates,
@@ -297,3 +295,82 @@ def rank_candidates(jd_embedding, exclude_id=None):
     except Exception as e:
         print(f"Error ranking candidates: {e}")
         return None
+
+def compare_skills(job_skills, candidate_skills):
+    """
+    Compare skills between a job description and a candidate profile.
+
+    Parameters:
+        job_skills (list): List of skills required by the job description.
+        candidate_skills (list): List of skills in the candidate's profile.
+
+    Returns:
+        dict: A dictionary containing matched, missing, and extra skills.
+    """
+    # Convert lists to sets for comparison
+    job_skills_set = set(job_skills)
+    candidate_skills_set = set(candidate_skills)
+
+    matched_skills = list(job_skills_set.intersection(candidate_skills_set))
+    missing_skills = list(job_skills_set - candidate_skills_set)
+    extra_skills = list(candidate_skills_set - job_skills_set)
+
+    return {
+        "matched_skills": matched_skills,
+        "missing_skills": missing_skills,
+        "extra_skills": extra_skills
+    }
+
+def extract_skill_embeddings(skill_names, text_embeddings, skill_to_index):
+    """
+    Extract embeddings for specific skills from the full text embeddings.
+
+    Parameters:
+        skill_names (list): List of skill names.
+        text_embeddings (np.array): Embeddings for the full text.
+        skill_to_index (dict): Mapping of skill names to their positions in the text.
+
+    Returns:
+        np.array: Embeddings for the specified skills.
+    """
+    skill_indices = [skill_to_index[skill] for skill in skill_names]
+    return text_embeddings[skill_indices]
+
+def compare_skill_embeddings(job_skills, candidate_skills, threshold=0.8):
+    """
+    Compare job skills and candidate skills using embeddings.
+
+    Parameters:
+        job_skills (list): List of job skill names.
+        candidate_skills (list): List of candidate skill names.
+        threshold (float): Similarity threshold for matching skills.
+
+    Returns:
+        dict: A dictionary containing matched, missing, and extra skills.
+    """
+    job_skill_embeddings = embedding_model.encode(job_skills, convert_to_tensor=True)
+
+    candidate_skill_embeddings = embedding_model.encode(candidate_skills, convert_to_tensor=True)
+
+    similarity_matrix = cosine_similarity(job_skill_embeddings.cpu().numpy(), candidate_skill_embeddings.cpu().numpy())
+
+    # Find matched, missing, and extra skills
+    matched_skills = []
+    missing_skills = []
+    extra_skills = candidate_skills.copy()
+
+    for i, job_skill in enumerate(job_skills):
+        max_similarity = np.max(similarity_matrix[i])
+        if max_similarity >= threshold:
+            matched_index = np.argmax(similarity_matrix[i])
+            matched_skill = candidate_skills[matched_index]
+            matched_skills.append((job_skill, matched_skill))
+            extra_skills.remove(matched_skill)
+        else:
+            missing_skills.append(job_skill)
+
+    return {
+        "matched_skills": matched_skills,
+        "missing_skills": missing_skills,
+        "extra_skills": extra_skills
+    }

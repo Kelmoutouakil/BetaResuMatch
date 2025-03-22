@@ -49,7 +49,10 @@ class Resume(models.Model):
     file = models.FileField(upload_to='resumes/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     summary = models.TextField(null=True, blank=True)
-    job_name = models.CharField(max_length=255, blank=True, null=True)
+    MatchedSkills=models.TextField(null=True, blank=True)
+    MissingSkills=models.TextField(null=True, blank=True)
+    ExtractSkills=models.TextField(null=True, blank=True)
+    score = models.IntegerField(default=0)
     name = models.CharField(max_length=255, blank=True, null=True)
     class Meta:
         db_table= 'resume'

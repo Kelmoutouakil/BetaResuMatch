@@ -13,7 +13,7 @@ export default function SidebarLayout({
       <SidebarProvider>
         <AppSidebar />
         <main className="flex-1 overflow-auto">
-          <div className="p-4">
+          <div className="p-4 items-start flex justify-between gap-auto">
             <SidebarTrigger className="mb-4" />
             {children}
           </div>

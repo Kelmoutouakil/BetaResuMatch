@@ -7,7 +7,9 @@ import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
+import { toast } from "sonner";
+import Cookies from "js-cookie";
+import { useRecruiter } from "@/Context/RecruiterContext";
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -16,6 +18,7 @@ export default function LoginForm() {
     email: "",
     password: "",
   });
+  const { setIsSigned } = useRecruiter();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -40,14 +43,15 @@ export default function LoginForm() {
         }
       );
 
-      // Axios already parses JSON, so use res.data directly
       const data = res.data;
       localStorage.setItem("accessToken", data.access);
       localStorage.setItem("refreshToken", data.refresh);
-
-      router.push("/Home");
+      toast.success("logging in successfully ✅");
+      setIsSigned(true);
+      Cookies.set("isSigned", "true", { expires: 1 });
+      router.push("/home");
     } catch (err: any) {
-      console.error("Login error:", err.response?.data);
+      toast.error("Failed to fetch data ❌");
       setError(err.response?.data?.detail || "Invalid credentials");
     } finally {
       setLoading(false);

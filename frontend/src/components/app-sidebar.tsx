@@ -1,11 +1,12 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
-import { IoIosLogOut } from "react-icons/io";
+import { RiChatNewFill } from "react-icons/ri";
+import { IoLogOut } from "react-icons/io5";
+import Cookies from "js-cookie";
+import { useRecruiter } from "@/Context/RecruiterContext";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -18,36 +19,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import ResumeViewer from "./resume-viewer";
 
 const items = [
   {
     title: "New Chat",
     url: "#",
-    icon: Home,
+    icon: RiChatNewFill,
   },
-  // {
-  //   title: "Inbox",
-  //   url: "#",
-  //   icon: Inbox,
-  // },
-  // {
-  //   title: "Calendar",
-  //   url: "#",
-  //   icon: Calendar,
-  // },
-  // {
-  //   title: "Search",
-  //   url: "#",
-  //   icon: Search,
-  // },
-  // {
-  //   title: "Settings",
-  //   url: "#",
-  //   icon: Settings,
-  // },
 ];
-
 export function AppSidebar() {
+  const { setIsSigned } = useRecruiter();
+  const handleClick = () => {
+    setIsSigned(false);
+    Cookies.remove("isSigned");
+    window.location.href = "/login"; // Redirect after logout
+  };
   return (
     <Sidebar className="bg-transparent">
       <SidebarHeader className="bg-[#3F788A52]">
@@ -56,13 +43,14 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                <div className="flex items-center space-x-3">
-          <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
-            <span className="text-white text-xl">β</span>
-          </div>
-          <span className="text-black font-bold text-xl">Ask Beta AI</span>
-        </div>
-                  {/* <ChevronDown className="ml-auto" /> */}
+                  <div className="flex items-center space-x-3">
+                    <div className="w-7 h-7 bg-black rounded-full flex items-center justify-center">
+                      <span className="text-white text-xl">β</span>
+                    </div>
+                    <span className="text-black font-bold text-xl">
+                      Ask Beta AI
+                    </span>
+                  </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
@@ -80,13 +68,16 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-5">
+              <ResumeViewer />
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
                       <item.icon />
-                      <span className="ml-2 text-lg font-semibold">{item.title}</span>
+                      <span className="ml-2 text-lg font-semibold">
+                        {item.title}
+                      </span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -99,28 +90,15 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
-                <div className="ml-2 text-lg font-semibold flex flex-col w-full items-start justify-center">
-                  {/* <SidebarMenuButton > */}
-                <a href={"/"} className="flex flex-row items-center justify-center">
-                      <IoIosLogOut />
-                      <span className="ml-4 text-lg font-semibold">Logout</span>
-                    </a>
-                    {/* <SidebarMenuButton /> */}
-                </div>
-              {/* <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
-                <DropdownMenuItem>
-                  <span>Account</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Billing</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent> */}
+              <div className="ml-2 text-lg font-semibold flex flex-col w-full items-start justify-center mb-3">
+                <a
+                  href={"/"}
+                  className="flex flex-row items-center justify-center"
+                >
+                  <IoLogOut className="size-[20px]" />
+                  <span className="ml-4 text-lg font-semibold" onClick={handleClick}>Logout</span>
+                </a>
+              </div>
             </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>

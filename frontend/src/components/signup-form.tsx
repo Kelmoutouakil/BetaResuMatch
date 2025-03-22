@@ -5,7 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import axios from "axios";
-
+import { toast } from "sonner";
+import { useRecruiter } from "@/Context/RecruiterContext";
+import Cookies from "js-cookie";
 export default function SignupForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +19,7 @@ export default function SignupForm() {
     password1: "",
     password2: "",
   });
-
+  const { setIsSigned } = useRecruiter();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -35,16 +37,23 @@ export default function SignupForm() {
       password2: formData.get("password"),
     };
     try {
-      const response = await axios.post(
+      console.log(userData);
+      const res = await axios.post(
         "http://localhost:9000/user/create/",
         userData,
         {
           headers: { "Content-Type": "application/json" },
         }
       );
-
-      router.push("/Home");
+      const data = res.data;
+      localStorage.setItem("accessToken", data.access);
+      localStorage.setItem("refreshToken", data.refresh);
+      setIsSigned(true);
+      Cookies.set("isSigned", "true", { expires: 1 });
+      toast.success("signing up successfully ✅");
+      router.push("/home");
     } catch (err: any) {
+      toast.error("Failed to fetch data ❌");
       setError(err.response?.data?.message || "Something went wrong!");
     } finally {
       setLoading(false);

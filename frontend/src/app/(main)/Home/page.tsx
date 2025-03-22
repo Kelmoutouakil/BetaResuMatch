@@ -2,13 +2,11 @@
 
 import type React from "react";
 import { useState } from "react";
-import Loader from "@/components/Loader";
 import { Search, Upload, ArrowRight } from "lucide-react";
 import axios from "axios";
-import { useRouter } from "next/router";
-
+import { useRouter } from "next/navigation";
 export default function SearchPage() {
-  // const router = useRouter();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,24 +20,23 @@ export default function SearchPage() {
     try {
       const res = await axios.post(
         " http://127.0.0.1:9000/api/JDupload/",
-        searchQuery,
+        { job_description: query },
         {
           headers: { "Content-Type": "application/json" },
         }
       );
-      // router.push("/");
-    } catch(err: any) {
+      router.push("/home");
+      setSearchQuery("");
+    } catch (err: any) {
       setError(err.response?.data?.message || "Something went wrong!");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
 
-
   return (
     <div className="min-h-screen flex flex-col w-full">
-      <nav className="w-full py-6 px-8 md:px-16 flex justify-between items-center">
+      <nav>
       </nav>
       <main className="flex-1 flex flex-col items-center justify-center px-6">
         <div className="w-32 h-32 md:w-40 md:h-40 mb-12 flex items-center justify-center">
@@ -74,8 +71,8 @@ export default function SearchPage() {
               className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#89A8B2] rounded-full flex items-center justify-center hover:bg-opacity-90 transition-colors"
             >
               {/* {loading ? ( */}
-            {/* // <ArrowRight className="w-5 h-5 text-white" /> ) : (<Loader />)} */}
-               <ArrowRight className="w-5 h-5 text-white" />
+              {/* // <ArrowRight className="w-5 h-5 text-white" /> ) : (<Loader />)} */}
+              <ArrowRight className="w-5 h-5 text-white" />
             </button>
           </div>
         </form>

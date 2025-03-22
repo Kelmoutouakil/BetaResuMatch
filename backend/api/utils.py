@@ -1,4 +1,5 @@
 from PyPDF2 import PdfReader
+from huggingface_hub import InferenceClient
 from PIL import Image
 import pytesseract
 import google.generativeai as genai
@@ -6,6 +7,8 @@ import json
 import os, re, time
 from .pinecone_integr import embedding_model, index
 import uuid
+repo_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+client = InferenceClient(model=repo_id, token=os.getenv('HUGGINGFACE_API_KEY'))
 def extract_text(file_path):
     if file_path.endswith('.pdf'):
         reader = PdfReader(file_path)
@@ -13,10 +16,11 @@ def extract_text(file_path):
         for page in reader.pages:
             text += page.extract_text()
         return text
-    elif file_path.endswitch(('.png', '.jpg', '.jpeg')):
-        image = Image.open(file_path)
-        text = pytesseract.image_to_string(image)
-        return text
+    # elif file_path.endswitch(('.png', '.jpg', '.jpeg')):
+    #     image = Image.open(file_path)
+    #     text = pytesseract.image_to_string(image)
+    #     print("----text : ",text, flush=True)
+    #     return text
     else:
         raise ValueError("Unsupport file format")
  
@@ -163,7 +167,7 @@ def get_jd_embedding(jd_data, retries=3):
                 print("Failed to generate embedding after retries.")
                 return None
             
-def store_jd_embedding(jd_id=None, jd_embedding=None):
+def store_jd_embedding(jd_id,jd_embedding):
     """
     Store job description embeddings in Pinecone with error handling.
     If no ID is provided, generate a UUID.
@@ -172,9 +176,9 @@ def store_jd_embedding(jd_id=None, jd_embedding=None):
         jd_id = str(uuid.uuid4())  # Generate a unique ID if not provided
     try:
         index.upsert([(jd_id, jd_embedding.tolist())])
-        print(f"Successfully stored JD embedding for ID: {jd_id}")
+        print(f"Successfully stored JD embedding f")
     except Exception as e:
-        print(f"Failed to store JD embedding for ID {jd_id}: {e}")
+        print(f"Failed to store JD embedding : {e}")
 
 
 def get_cv_embedding(cv_data, retries=3, timeout=10):
@@ -189,12 +193,13 @@ def get_cv_embedding(cv_data, retries=3, timeout=10):
         tensor: Embedding tensor or None if failed.
     """
     text_representation = f"""
-    Name: {cv_data['personal_information'].get('name', 'Unknown')}
-    Education: {', '.join([edu['degree'] + ' from ' + edu['institution'] for edu in cv_data.get('education', [])])}
-    Work Experience: {', '.join([job['role'] + ' at ' + job['company'] for job in cv_data.get('work_experience', [])])}
-    Skills: {', '.join(cv_data.get('skills', []))}
+    Name: {cv_data.get('name', 'Unknown')}
+    Education: {', '.join([f"{edu.get('degree', '')} from {edu.get('institution', '')}" for edu in cv_data.get('education', []) if edu.get('degree') and edu.get('institution')])}
+    Work Experience: {', '.join([f"{job.get('role', '')} at {job.get('company', '')}" for job in cv_data.get('work_experience', []) if job.get('role') and job.get('company')])}
+    Skills: {', '.join([skill for skill in cv_data.get('skills', []) if skill])}
     """
 
+    # print("text representa : ",text_representation,flush=True)
     start_time = time.time()
     for attempt in range(retries):
         try:
@@ -209,6 +214,17 @@ def get_cv_embedding(cv_data, retries=3, timeout=10):
                 print("Failed to generate embedding after retries.")
                 return None
 
+def clear_pinecone():
+    """
+    Clear all data in Pinecone index.
+    """
+    try:
+        # Clear the entire index by deleting all IDs
+        index.delete(delete_all=True)  # Deleting all items in the index
+        print("Successfully cleared Pinecone index.")
+    except Exception as e:
+        print(f"Failed to clear Pinecone index: {e}")
+
 def store_cv_embedding(cv_id, cv_embedding):
     """
     Store candidate embeddings in Pinecone with error handling.
@@ -218,7 +234,26 @@ def store_cv_embedding(cv_id, cv_embedding):
         print(f"Successfully stored CV embedding for ID: {cv_id}")
     except Exception as e:
         print(f"Failed to store CV embedding for ID {cv_id}: {e}")
-        
+
+
+def summarize_text(text):
+    """
+    Generate a summary of the input text using the Mixtral model.
+    """
+
+    prompt = f"""
+    Summarize the following text into a concise and complete paragraph. Focus only on:
+    - Current role or academic status
+    - Educational background
+    - Relevant work experience
+    - Technical skills and expertise
+
+    Exclude any information about spoken languages, hobbies, or interests. Ensure the summary is well-structured and does not exceed 50 words:
+    
+    {text}
+    """
+    response = client.text_generation(prompt)
+    return response
 
 def rank_candidates(jd_embedding, exclude_id=None):
     """

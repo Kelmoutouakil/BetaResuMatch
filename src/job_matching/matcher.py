@@ -16,7 +16,7 @@ def rank_candidates(jd_embedding, exclude_id=None):
         # Query Pinecone for similar embeddings
         results = index.query(
             vector=jd_embedding.tolist(),
-            top_k=10,
+            top_k=20,
             include_values=True
         )
 

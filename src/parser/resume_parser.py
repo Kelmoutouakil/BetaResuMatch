@@ -44,7 +44,7 @@ def parse_cv(cv_text):
     CV Text:
     {cv_text}
     """
-    model = genai.GenerativeModel("gemini-1.5-pro")  ##flush is better for this task
+    model = genai.GenerativeModel("gemini-1.5-flash")  ##flush is better for this task
     response = model.generate_content(prompt)
 
     cleaned_text = re.sub(r"```json|```", "", response.text).strip()

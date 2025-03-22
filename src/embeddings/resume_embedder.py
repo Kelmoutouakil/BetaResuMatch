@@ -17,7 +17,7 @@ def get_cv_embedding(cv_data, retries=3, timeout=10):
     if isinstance(cv_data, dict):
         # If input is a dictionary, generate text representation
         text_representation = f"""
-        Name: {cv_data['personal_information'].get('name', 'Unknown')}
+        Name: {cv_data.get('name', 'Unknown')}
         Education: {', '.join([edu['degree'] + ' from ' + edu['institution'] for edu in cv_data.get('education', [])])}
         Work Experience: {', '.join([job['role'] + ' at ' + job['company'] for job in cv_data.get('work_experience', [])])}
         Skills: {', '.join(cv_data.get('skills', []))}

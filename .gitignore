@@ -39,4 +39,4 @@ build/
 *.swp
 *.swo
 *.DS_Store
-data/
+sec_approach.py

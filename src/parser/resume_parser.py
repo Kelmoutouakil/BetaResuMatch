@@ -16,11 +16,11 @@ def parse_cv(cv_text):
         Extract the following information from the CV below and return a valid JSON object:
     
     {{
-        "personal_information": {{
-            "name": "Full name",
-            "contact_details": "Email, phone number, and other available contacts"
+        "name": "Full name of the candidate",
+        "contact": {{
+            "phone": "Phone number",
+            "email": "Email address",
         }},
-        "employment_type": "Full-time, Part-time, Contract, Internship, etc.",
         "education": [
             {{
                 "degree": "Degree title",
@@ -41,12 +41,10 @@ def parse_cv(cv_text):
 
     Only return JSON. Do not include explanations or text outside this JSON.
 
-    
-
     CV Text:
     {cv_text}
     """
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-1.5-pro")  ##flush is better for this task
     response = model.generate_content(prompt)
 
     cleaned_text = re.sub(r"```json|```", "", response.text).strip()

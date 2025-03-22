@@ -1,7 +1,6 @@
 from PyPDF2 import PdfReader
 import pytesseract
 from PIL import Image
-#import docx
 
 def extract_text(file_path):
     if file_path.endswith('.pdf'):

@@ -42,7 +42,7 @@ def parse_job_description(jd_text, retries=3):
     {jd_text}
     """
 
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-1.5-pro")#try flash!!!!!!
 
     for attempt in range(retries):
         try:

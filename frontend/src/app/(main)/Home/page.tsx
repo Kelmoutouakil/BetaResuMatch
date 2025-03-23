@@ -18,14 +18,14 @@ export default function SearchPage() {
 
   const sendQuery = async (query: string) => {
     try {
-      const res = await axios.post(
+      await axios.post(
         " http://127.0.0.1:9000/api/JDupload/",
         { job_description: query },
         {
           headers: { "Content-Type": "application/json" },
         }
       );
-      router.push("/home");
+      router.push("/home/chat");
       setSearchQuery("");
     } catch (err: any) {
       setError(err.response?.data?.message || "Something went wrong!");

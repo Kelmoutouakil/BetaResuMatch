@@ -1,21 +1,21 @@
 from PyPDF2 import PdfReader
-from PIL import Image
-import pytesseract
+from sklearn.metrics.pairwise import cosine_similarity
+from huggingface_hub import InferenceClient
 import google.generativeai as genai
 import json
+import numpy as np
 import os, re, time
 from .pinecone_integr import embedding_model, index
 import uuid
+from users.models import Resume
+repo_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+client = InferenceClient(model=repo_id, token=os.getenv('HUGGINGFACE_API_KEY'))
 def extract_text(file_path):
     if file_path.endswith('.pdf'):
         reader = PdfReader(file_path)
         text = ''
         for page in reader.pages:
             text += page.extract_text()
-        return text
-    elif file_path.endswitch(('.png', '.jpg', '.jpeg')):
-        image = Image.open(file_path)
-        text = pytesseract.image_to_string(image)
         return text
     else:
         raise ValueError("Unsupport file format")
@@ -49,7 +49,10 @@ def Parse_resume(text):
                 "projects": "Key projects and contributions"
             }}
         ],
-        "skills": ["Skill1", "Skill2", "Skill3"]
+        "skills": ["Skill1", "Skill2", "Skill3"],
+        "job_title": "Current or most recent job title",
+        "latest_school": "Current or most recent school",
+        "desired_role": "Desired role or internship title"
     }}
 
     Only return JSON. Do not include explanations or text outside this JSON.
@@ -70,6 +73,7 @@ def Parse_resume(text):
     
 
     return parsed_info
+
 
 
 def parse_job_description(jd_text, retries=3):
@@ -163,7 +167,7 @@ def get_jd_embedding(jd_data, retries=3):
                 print("Failed to generate embedding after retries.")
                 return None
             
-def store_jd_embedding(jd_id=None, jd_embedding=None):
+def store_jd_embedding(jd_id,jd_embedding):
     """
     Store job description embeddings in Pinecone with error handling.
     If no ID is provided, generate a UUID.
@@ -172,33 +176,103 @@ def store_jd_embedding(jd_id=None, jd_embedding=None):
         jd_id = str(uuid.uuid4())  # Generate a unique ID if not provided
     try:
         index.upsert([(jd_id, jd_embedding.tolist())])
-        print(f"Successfully stored JD embedding for ID: {jd_id}")
+        print(f"Successfully stored JD embedding f")
     except Exception as e:
-        print(f"Failed to store JD embedding for ID {jd_id}: {e}")
+        print(f"Failed to store JD embedding : {e}")
 
 
+# def get_cv_embedding(cv_data, retries=3, timeout=10):
+#     """
+#     Convert structured CV data into text representation and generate embeddings with retry logic.
+    
+#     Parameters:
+#         cv_data (dict): Parsed CV data.
+#         retries (int): Number of retry attempts for API failures.
+    
+#     Returns:
+#         tensor: Embedding tensor or None if failed.
+#     """
+#     text_representation = f"""
+#     Name: {cv_data.get('name', 'Unknown')}
+#     Education: {', '.join([f"{edu.get('degree', '')} from {edu.get('institution', '')}" for edu in cv_data.get('education', []) if edu.get('degree') and edu.get('institution')])}
+#     Work Experience: {', '.join([f"{job.get('role', '')} at {job.get('company', '')}" for job in cv_data.get('work_experience', []) if job.get('role') and job.get('company')])}
+#     Skills: {', '.join([skill for skill in cv_data.get('skills', []) if skill])}
+#     """
+
+#     # print("text representa : ",text_representation,flush=True)
+#     start_time = time.time()
+#     for attempt in range(retries):
+#         try:
+#             return embedding_model.encode(text_representation, convert_to_tensor=True)
+#         except Exception as e:
+#             print(f"Attempt {attempt + 1} failed: {e}")
+#             if attempt < retries - 1 and (time.time() - start_time) < timeout:
+#                 wait_time = 2 ** attempt  # Exponential backoff
+#                 print(f"Retrying in {wait_time} seconds...")
+#                 time.sleep(wait_time)
+#             else:
+#                 print("Failed to generate embedding after retries.")
+#                 return None
 def get_cv_embedding(cv_data, retries=3, timeout=10):
     """
-    Convert structured CV data into text representation and generate embeddings with retry logic.
-    
+    Convert structured CV data or a list of skills into a meaningful text representation
+    and generate embeddings with retry logic.
+
     Parameters:
-        cv_data (dict): Parsed CV data.
+        cv_data (dict or list): Parsed CV data (dictionary) or list of skills.
         retries (int): Number of retry attempts for API failures.
-    
+        timeout (int): Maximum time (in seconds) to spend on retries.
+
     Returns:
         tensor: Embedding tensor or None if failed.
     """
-    text_representation = f"""
-    Name: {cv_data['personal_information'].get('name', 'Unknown')}
-    Education: {', '.join([edu['degree'] + ' from ' + edu['institution'] for edu in cv_data.get('education', [])])}
-    Work Experience: {', '.join([job['role'] + ' at ' + job['company'] for job in cv_data.get('work_experience', [])])}
-    Skills: {', '.join(cv_data.get('skills', []))}
-    """
+    if isinstance(cv_data, dict):
+        # If input is a dictionary, generate text representation
+        name = cv_data.get("name", "Unknown")
+        education = cv_data.get("education", [])
+        work_experience = cv_data.get("work_experience", [])
+        skills = cv_data.get("skills", [])
+        job_title = cv_data.get("job_title", "Unknown")
+        latest_school = cv_data.get("latest_school", "Unknown")
+        desired_role = cv_data.get("desired_role", "Unknown")
 
+        # Generate text representation for education
+        education_text = ", ".join([
+            f"{edu.get('degree', 'Unknown Degree')} from {edu.get('institution', 'Unknown Institution')}"
+            for edu in education
+        ])
+
+        # Generate text representation for work experience
+        work_experience_text = ", ".join([
+            f"{job.get('role', 'Unknown Role')} at {job.get('company', 'Unknown Company')}"
+            for job in work_experience
+        ])
+
+        # Generate text representation for skills
+        skills_text = ", ".join(skills)
+
+        # Combine all fields into a single text representation
+        text_representation = f"""
+        Name: {name}
+        Job Title: {job_title}
+        Latest School: {latest_school}
+        Desired Role: {desired_role}
+        Education: {education_text}
+        Work Experience: {work_experience_text}
+        Skills: {skills_text}
+        """
+    elif isinstance(cv_data, list):
+        # If input is a list of skills, generate text representation
+        text_representation = f"Skills: {', '.join(cv_data)}"
+    else:
+        raise ValueError("Input must be a dictionary or a list of skills.")
+
+    # Retry logic for generating embeddings
     start_time = time.time()
     for attempt in range(retries):
         try:
-            return embedding_model.encode(text_representation, convert_to_tensor=True)
+            embedding = embedding_model.encode(text_representation, convert_to_tensor=True)
+            return embedding
         except Exception as e:
             print(f"Attempt {attempt + 1} failed: {e}")
             if attempt < retries - 1 and (time.time() - start_time) < timeout:
@@ -208,6 +282,17 @@ def get_cv_embedding(cv_data, retries=3, timeout=10):
             else:
                 print("Failed to generate embedding after retries.")
                 return None
+            
+def clear_pinecone():
+    """
+    Clear all data in Pinecone index.
+    """
+    try:
+        # Clear the entire index by deleting all IDs
+        index.delete(delete_all=True)  # Deleting all items in the index
+        print("Successfully cleared Pinecone index.")
+    except Exception as e:
+        print(f"Failed to clear Pinecone index: {e}")
 
 def store_cv_embedding(cv_id, cv_embedding):
     """
@@ -218,47 +303,137 @@ def store_cv_embedding(cv_id, cv_embedding):
         print(f"Successfully stored CV embedding for ID: {cv_id}")
     except Exception as e:
         print(f"Failed to store CV embedding for ID {cv_id}: {e}")
-        
 
+
+def summarize_text(text):
+    """
+    Generate a summary of the input text using the Mixtral model.
+    """
+
+    prompt = f"""
+    Summarize the following text into a concise and complete paragraph. Focus only on:
+    - Current role or academic status
+    - Educational background
+    - Relevant work experience
+    - Technical skills and expertise
+
+    Exclude any information about spoken languages, hobbies, or interests. Ensure the summary is well-structured and does not exceed 50 words:
+    
+    {text}
+    """
+    response = client.text_generation(prompt)
+    return response
 def rank_candidates(jd_embedding, exclude_id=None):
-    """
-    Retrieve the top matching candidates from Pinecone and rank them.
-    Exclude a specific ID (e.g., the job description itself).
-
-    Parameters:
-        jd_embedding (np.array): Embedding of the job description.
-        exclude_id (str): ID to exclude from ranking (e.g., job description ID).
-
-    Returns:
-        list: Ranked candidates with similarity scores.
-    """
     try:
         # Query Pinecone for similar embeddings
         results = index.query(
             vector=jd_embedding.tolist(),
-            top_k=10,
+            top_k=20,
             include_values=True
         )
 
         # Filter out the excluded ID (e.g., job description)
-        ranked_candidates = []
+        # ranked_candidates = []
         for match in results['matches']:
-            if match['id'] != exclude_id:  # Exclude the job description
+            if match['id'] != '-1' and  match['id'] != exclude_id  :
+                resume =  Resume.objects.get(id=match['id'])
+                # Exclude the job description
                 similarity_percentage = round(match['score'] * 100, 2)  # Convert score to percentage
-                ranked_candidates.append({
-                    "candidate_id": match['id'],
-                    "similarity_score": similarity_percentage  # Keep as numerical value for sorting
-                })
+                resume.score = similarity_percentage
+                resume.save()
+                # ranked_candidates.append({
+                #     "candidate_id": match['id'],
+                #     "similarity_score": similarity_percentage  # Keep as numerical value for sorting
+                # })
 
         # Sort candidates by similarity score in descending order
-        ranked_candidates = sorted(
-            ranked_candidates,
-            key=lambda x: x["similarity_score"],
-            reverse=True
-        )
+        # ranked_candidates = sorted(
+        #     ranked_candidates,
+        #     key=lambda x: x["similarity_score"],
+        #     reverse=True
+        # )
 
-        return ranked_candidates
+        # return ranked_candidates
 
     except Exception as e:
         print(f"Error ranking candidates: {e}")
-        return None
+        # return None
+
+def compare_skills(job_skills, candidate_skills):
+    """
+    Compare skills between a job description and a candidate profile.
+
+    Parameters:
+        job_skills (list): List of skills required by the job description.
+        candidate_skills (list): List of skills in the candidate's profile.
+
+    Returns:
+        dict: A dictionary containing matched, missing, and extra skills.
+    """
+    # Convert lists to sets for comparison
+    job_skills_set = set(job_skills)
+    candidate_skills_set = set(candidate_skills)
+
+    matched_skills = list(job_skills_set.intersection(candidate_skills_set))
+    missing_skills = list(job_skills_set - candidate_skills_set)
+    extra_skills = list(candidate_skills_set - job_skills_set)
+
+    return {
+        "matched_skills": matched_skills,
+        "missing_skills": missing_skills,
+        "extra_skills": extra_skills
+    }
+
+def extract_skill_embeddings(skill_names, text_embeddings, skill_to_index):
+    """
+    Extract embeddings for specific skills from the full text embeddings.
+
+    Parameters:
+        skill_names (list): List of skill names.
+        text_embeddings (np.array): Embeddings for the full text.
+        skill_to_index (dict): Mapping of skill names to their positions in the text.
+
+    Returns:
+        np.array: Embeddings for the specified skills.
+    """
+    skill_indices = [skill_to_index[skill] for skill in skill_names]
+    return text_embeddings[skill_indices]
+
+def compare_skill_embeddings(job_skills, candidate_skills, threshold=0.8):
+    """
+    Compare job skills and candidate skills using embeddings.
+
+    Parameters:
+        job_skills (list): List of job skill names.
+        candidate_skills (list): List of candidate skill names.
+        threshold (float): Similarity threshold for matching skills.
+
+    Returns:
+        dict: A dictionary containing matched, missing, and extra skills.
+    """
+    job_skill_embeddings = embedding_model.encode(job_skills, convert_to_tensor=True)
+
+    candidate_skill_embeddings = embedding_model.encode(candidate_skills, convert_to_tensor=True)
+
+    similarity_matrix = cosine_similarity(job_skill_embeddings.cpu().numpy(), candidate_skill_embeddings.cpu().numpy())
+
+    # Find matched, missing, and extra skills
+    matched_skills = []
+    missing_skills = []
+    extra_skills = candidate_skills.copy()
+
+    for i, job_skill in enumerate(job_skills):
+        max_similarity = np.max(similarity_matrix[i])
+        if max_similarity >= threshold:
+            matched_index = np.argmax(similarity_matrix[i])
+            matched_skill = candidate_skills[matched_index]
+            matched_skills.append((job_skill, matched_skill))
+            extra_skills.remove(matched_skill)
+        else:
+            missing_skills.append(job_skill)
+
+    return {
+        "matched_skills": matched_skills,
+        "missing_skills": missing_skills,
+        "extra_skills": extra_skills
+    }

@@ -20,16 +20,17 @@ def CreateUser(request):
         last_name = form.cleaned_data['last_name']
         email = form.cleaned_data['email']
         password = form.cleaned_data['password1']
-
-    user =  User.objects.create_user(
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({"error": "User already exists with this email."}, status=400)
+        user =  User.objects.create_user(
         first_name = first_name,
         last_name = last_name,
         email = email,
         password=password
-    )
-    user.save()
-    return JsonResponse({"data" : "user created"})
-
+        )
+        user.save()
+        return JsonResponse({"data" : "user created"})
+    return JsonResponse({"error": form.errors}, status=400)
 
 def PostFile(request):
     return render(request,'login.html')

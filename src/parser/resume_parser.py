@@ -36,7 +36,10 @@ def parse_cv(cv_text):
                 "projects": "Key projects and contributions"
             }}
         ],
-        "skills": ["Skill1", "Skill2", "Skill3"]
+        "skills": ["Skill1", "Skill2", "Skill3"],
+        "job_title": "Current or most recent job title",
+        "latest_school": "Current or most recent school",
+        "desired_role": "Desired role or internship title"
     }}
 
     Only return JSON. Do not include explanations or text outside this JSON.

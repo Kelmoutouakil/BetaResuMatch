@@ -52,6 +52,7 @@ class Resume(models.Model):
     MatchedSkills=models.TextField(null=True, blank=True)
     MissingSkills=models.TextField(null=True, blank=True)
     ExtractSkills=models.TextField(null=True, blank=True)
+    parsed_resume = models.JSONField(default=dict)
     score = models.IntegerField(default=0)
     name = models.CharField(max_length=255, blank=True, null=True)
     jobtitle = models.CharField(max_length=255, blank=True, null=True)

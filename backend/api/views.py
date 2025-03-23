@@ -50,9 +50,9 @@ def JDupload(request):
             parsed_resume = Parse_resume(text)
             skill_comparison_result = compare_skill_embeddings(jd_skills,  parsed_resume.get("skills", []), threshold=0.8)
             print(f"\nSkill Comparison for Resume:",resume.file.path,flush=True)
-            print("Matched Skills:", skill_comparison_result["matched_skills"],flush=True)
-            print("Missing Skills:", skill_comparison_result["missing_skills"],flush=True)
-            print("Extra Skills:", skill_comparison_result["extra_skills"],flush=True)
+            # print("Matched Skills:", skill_comparison_result["matched_skills"],flush=True)
+            # print("Missing Skills:", skill_comparison_result["missing_skills"],flush=True)
+            # print("Extra Skills:", skill_comparison_result["extra_skills"],flush=True)
             resume.name = parsed_resume.get('name')  
             resume.summary = summary
             resume.MatchedSkills = skill_comparison_result["matched_skills"]
@@ -74,5 +74,7 @@ def JDupload(request):
     print(ranked_candidates,flush=True)
     if not ranked_candidates :
         return JsonResponse({'status':'no matched resumes with your job description :('})
-    
-    return JsonResponse({'status':'success'})
+    print("--------------------------------",flush=True)
+    print("ranked : ",ranked_candidates,flush=True)
+    print("--------------------------------",flush=True)
+    return JsonResponse({'Ranking':ranked_candidates})

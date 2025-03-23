@@ -3,6 +3,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from huggingface_hub import InferenceClient
 import google.generativeai as genai
 import json
+import numpy as np
 import os, re, time
 from .pinecone_integr import embedding_model, index
 import uuid
@@ -280,6 +281,11 @@ def rank_candidates(jd_embedding, exclude_id=None,n=10):
                 resume.score = similarity_percentage  # Update the score
                 resume.save()
                 ranked_candidates.append({
+                    # "name":resume.name,
+                    # "summary":resume.summary,
+                    # "MatchedSkills":resume.MatchedSkills,
+                    # "MissedSkills":resume.MissingSkills,
+                    # "ExtractSkills":resume.ExtractSkills,
                     "candidate_id": match['id'],
                     "similarity_score": similarity_percentage  
                 })

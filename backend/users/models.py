@@ -54,6 +54,9 @@ class Resume(models.Model):
     ExtractSkills=models.TextField(null=True, blank=True)
     score = models.IntegerField(default=0)
     name = models.CharField(max_length=255, blank=True, null=True)
+    jobtitle = models.CharField(max_length=255, blank=True, null=True)
+    Instutut_name = models.CharField(max_length=255, blank=True, null=True)
+    desired_role = models.CharField(max_length=255, blank=True, null=True)
     class Meta:
         db_table= 'resume'
     

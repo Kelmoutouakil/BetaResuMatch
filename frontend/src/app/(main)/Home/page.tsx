@@ -25,7 +25,7 @@ export default function SearchPage() {
           headers: { "Content-Type": "application/json" },
         }
       );
-      router.push("/home");
+      router.push("/home/chat");
       setSearchQuery("");
     } catch (err: any) {
       setError(err.response?.data?.message || "Something went wrong!");

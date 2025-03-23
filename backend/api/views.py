@@ -1,5 +1,7 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from .serializer import ResumeSerializer
 from .utils import (
     extract_text, 
     Parse_resume, store_cv_embedding, get_cv_embedding, summarize_text, compare_skill_embeddings,
@@ -18,12 +20,12 @@ def Upload(request):
         uploaded_files = request.FILES.getlist('files')
         saved_files = []
         for file in uploaded_files:
-            # print("-----------",file.name,flush=True)
+            print("-----------",file.name,flush=True)
             filename, ext = os.path.splitext(file.name)
             if ext.lower() != '.pdf':
                 return JsonResponse({'error': f'Invalid file type: {ext}'}, status=400)
             resume = Resume(user=request.user,file=file)
-            # resume.file.name = f"{filename}{ext}"
+            resume.file.name = f"{filename}{ext}"
             resume.save()
             text =  extract_text(resume.file.path)
             summary = summarize_text(text)
@@ -35,11 +37,11 @@ def Upload(request):
             resume.Instutut_name = parsed_resume.get('latest_school')
             resume.desired_role  = parsed_resume.get('desired_role')
             resume.summary = summary
-            # print(" name :  ------",resume.name,"<\n",flush=True)
-            # print(" jobtitle :  ------",resume.jobtitle,"<\n",flush=True)
-            # print(" INStutut :  ------",resume.Instutut_name,"<\n",flush=True)
-            # print(" role :  ------",resume.desired_role,"<\n",flush=True)
-            # print(" sumarry :  ------",resume.summary,"\n",flush=True)
+            print(" name :  ------",resume.name,"<\n",flush=True)
+            print(" jobtitle :  ------",resume.jobtitle,"<\n",flush=True)
+            print(" INStutut :  ------",resume.Instutut_name,"<\n",flush=True)
+            print(" role :  ------",resume.desired_role,"<\n",flush=True)
+            print(" sumarry :  ------",resume.summary,"\n",flush=True)
             saved_files.append({
                 'file_name': resume.file.name,
                 'file_path': resume.file.path
@@ -70,11 +72,13 @@ def JDupload(request):
                     resume.ExtractSkills = skill_comparison_result["extra_skills"]
                     resume.save()
                     score = match_resume_to_jd(text,data.get('job_description'))
-                    # print("score is ---",score," name : ",resume.file.path,flush=True)
+                    print("score is ---",score," name : ",resume.file.path,flush=True)
                     print("score ",score, "path ",resume.file.path, flush=True)
                     resume.score = score
                     resume.save()
-                    return JsonResponse({'Ranking': 'Done'})
+                ranked_resumes = Resume.objects.order_by('-score')
+                serializer = ResumeSerializer(ranked_resumes, many=True)
+                return Response(serializer.data)
             elif data.get('model') == '2':
                 clear_pinecone()
                 try:
@@ -95,15 +99,10 @@ def JDupload(request):
                 jd_embedding=get_jd_embedding(parsed_job_des) 
                 job_id = "ML engineer"
                 store_jd_embedding(job_id, jd_embedding)
-                ranked_candidates = rank_candidates(jd_embedding, exclude_id=job_id)
-                if not ranked_candidates :
-                    return JsonResponse({'status':'no matched resumes with your job description :('})
-                print("--------------------------------",flush=True)
-                print("ranked : ",ranked_candidates,flush=True)
-                print("--------------------------------",flush=True)
-                return JsonResponse({'Ranking': 'Done'})
-            else:
-                return JsonResponse({'error': 'type model not found'},status=404)
+                rank_candidates(jd_embedding, exclude_id=job_id)
+                ranked_resumes = Resume.objects.order_by('-score')
+                serializer = ResumeSerializer(ranked_resumes, many=True)
+                return Response(serializer.data)
     else:
         return JsonResponse({'error': 'send model'})
 

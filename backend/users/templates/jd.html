@@ -10,24 +10,14 @@
     <button id="submit">submit</button>
 </body>
 <script>
-     let crftoken;
-    fetch("http://127.0.0.1:9000/user/getcsrf/",{
-        method: 'GET'
-    })
-    .then((response)=>response.json())
-    .then((data)=>{ crftoken = data.crfToken;
-        
-    })
-    .catch((error)=>{
-        console.log(error)
-    })
-
+    
+    access = localStorage.getItem("access")
     document.getElementById("submit").addEventListener("click",()=>{
         fetch("http://127.0.0.1:9000/api/JDupload/",{
         method: 'POST',
         headers: {
             'content-type':'application/json',
-            'X-CSRFToken' : crftoken
+             Authorization: `Bearer ${access}`
         },
         body: JSON.stringify({"job_description" : document.getElementById("jd").value})
     })

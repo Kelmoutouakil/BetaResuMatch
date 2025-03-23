@@ -18,7 +18,7 @@ export default function SearchPage() {
 
   const sendQuery = async (query: string) => {
     try {
-      await axios.post(
+      const res = await axios.post(
         " http://127.0.0.1:9000/api/JDupload/",
         { job_description: query },
         {

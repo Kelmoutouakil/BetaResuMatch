@@ -83,7 +83,7 @@ export default function ResumeViewer() {
     try {
       const formData = new FormData();
       for (let i = 0; i < resumes.length; i++) {
-        formData.append("files[]", resumes[i]);
+        formData.append("files", resumes[i]);
       }
 
       await axios.post(

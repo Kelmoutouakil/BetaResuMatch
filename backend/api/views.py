@@ -18,7 +18,6 @@ import uuid,os,json
 def Upload(request):
     if request.FILES.get('files'):
         uploaded_files = request.FILES.getlist('files')
-        saved_files = []
         for file in uploaded_files:
             print("-----------",file.name,flush=True)
             filename, ext = os.path.splitext(file.name)
@@ -37,15 +36,13 @@ def Upload(request):
             resume.Instutut_name = parsed_resume.get('latest_school')
             resume.desired_role  = parsed_resume.get('desired_role')
             resume.summary = summary
+            resume.ExtractSkills = parsed_resume.get('skills')
+            resume.save()
             print(" name :  ------",resume.name,"<\n",flush=True)
             print(" jobtitle :  ------",resume.jobtitle,"<\n",flush=True)
             print(" INStutut :  ------",resume.Instutut_name,"<\n",flush=True)
             print(" role :  ------",resume.desired_role,"<\n",flush=True)
             print(" sumarry :  ------",resume.summary,"\n",flush=True)
-            saved_files.append({
-                'file_name': resume.file.name,
-                'file_path': resume.file.path
-            })  
         return JsonResponse({'status':'File uploaded successefuly'},status=200)
     return JsonResponse({'error': 'No file uploaded'}, status=400)
     
@@ -65,8 +62,8 @@ def JDupload(request):
             if data.get('model')== '1':
                 for resume in resumes:
                     text =  extract_text(resume.file.path)
-                    parsed_resume = Parse_resume(text)
-                    skill_comparison_result = compare_skill_embeddings(jd_skills,  parsed_resume.get("skills", []), threshold=0.8)
+                    # parsed_resume = Parse_resume(text)
+                    skill_comparison_result = compare_skill_embeddings(jd_skills,  resume.parsed_resume.get("skills", []), threshold=0.8)
                     resume.MatchedSkills = skill_comparison_result["matched_skills"]
                     resume.MissingSkills = skill_comparison_result["missing_skills"]
                     resume.ExtractSkills = skill_comparison_result["extra_skills"]
@@ -83,9 +80,9 @@ def JDupload(request):
                 clear_pinecone()
                 try:
                     for resume in resumes:
-                        text =  extract_text(resume.file.path)
-                        parsed_resume = Parse_resume(text)
-                        skill_comparison_result = compare_skill_embeddings(jd_skills,  parsed_resume.get("skills", []), threshold=0.8)
+                        # text =  extract_text(resume.file.path)
+                        # parsed_resume = Parse_resume(text)
+                        skill_comparison_result = compare_skill_embeddings(jd_skills,  resume.parsed_resume.get("skills", []), threshold=0.8)
                         resume.MatchedSkills = skill_comparison_result["matched_skills"]
                         resume.MissingSkills = skill_comparison_result["missing_skills"]
                         resume.ExtractSkills = skill_comparison_result["extra_skills"]
@@ -129,6 +126,17 @@ def filter_resumes_by_extract_skills(request):
     
     if skill:
         resumes = resumes.filter(ExtractSkills__icontains=skill)  
+    serializer = ResumeSerializer(resumes, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def filter_resumes_by_jobtitle(request):
+    jobtitle = request.query_params.get('jobtitle', None)  
+    resumes = Resume.objects.filter(user_id=request.user.id)
+    
+    if jobtitle:
+        resumes = resumes.filter(jobtitle__icontains=jobtitle)  
     serializer = ResumeSerializer(resumes, many=True)
     return Response(serializer.data)
 

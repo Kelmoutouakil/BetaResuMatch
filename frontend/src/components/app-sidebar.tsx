@@ -24,7 +24,7 @@ import ResumeViewer from "./resume-viewer";
 const items = [
   {
     title: "New Chat",
-    url: "#",
+    url: "home",
     icon: RiChatNewFill,
   },
 ];

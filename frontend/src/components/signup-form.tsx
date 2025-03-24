@@ -50,8 +50,7 @@ export default function SignupForm() {
       toast.success("signing up successfully ✅");
       router.push("/auth/login");
     } catch (err: any) {
-      toast.error("Failed to fetch data ❌");
-      setError(err.response?.data?.message || "Something went wrong!");
+      toast.error(err.response?.data?.message || "Something went wrong!");
     } finally {
       setLoading(false);
     }

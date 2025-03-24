@@ -12,21 +12,25 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
-const chartData = [
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-]
 
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig
+// Update the chartData to reflect the score as a percentage of 100
+export function Rating({ score }: { score: number }) {
+  const normalizedScore = Math.max(0, Math.min(100, score));
 
-export function Rating() {
+  const chartData = [
+    { browser: "safari", visitors: normalizedScore, fill: "var(--color-safari)" },
+  ];
+
+  const chartConfig = {
+    visitors: {
+      label: "Score",
+    },
+    safari: {
+      label: "Rating",
+      color: "hsl(var(--chart-2))",
+    },
+  } satisfies ChartConfig;
+
   return (
     <Card className="flex flex-col">
       <CardContent className="flex-1 pb-0">
@@ -37,7 +41,7 @@ export function Rating() {
           <RadialBarChart
             data={chartData}
             startAngle={0}
-            endAngle={250}
+            endAngle={360} // Full circle for better visualization of score
             innerRadius={80}
             outerRadius={110}
           >
@@ -48,7 +52,12 @@ export function Rating() {
               className="first:fill-muted last:fill-background"
               polarRadius={[86, 74]}
             />
-            <RadialBar dataKey="visitors" background cornerRadius={10} />
+            <RadialBar
+              dataKey="visitors"
+              background
+              cornerRadius={10}
+              fill="var(--color-safari)" // Change this to customize the color of the radial bar
+            />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {
@@ -65,14 +74,14 @@ export function Rating() {
                           y={viewBox.cy}
                           className="fill-foreground text-4xl font-bold"
                         >
-                          {chartData[0].visitors.toLocaleString()}
+                          {score}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          Score
                         </tspan>
                       </text>
                     )

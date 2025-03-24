@@ -2,39 +2,25 @@
 
 import type React from "react";
 import { useState } from "react";
-import { Search, Upload, ArrowRight } from "lucide-react";
+import { Search, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import api from "@/lib/axiosInstance";
-import { toast } from "sonner";
-
+import { useRecruiter } from "@/Context/RecruiterContext";
 
 export default function SearchPage() {
+  const { job_description, setJobDescription } = useRecruiter();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitted query:", searchQuery);
-    sendQuery(searchQuery);
-  };
-
-  const sendQuery = async (query: string) => {
-    try {
-      const response = await api.post("JDupload/", { job_description: query, 'model' : '2' });
-      console.log("response : ",response.data)
-      router.push("/home/chat");
-      setSearchQuery("");
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Something went wrong!");
-    } finally {
-      setLoading(false);
-    }
+    setJobDescription(searchQuery);
+    console.log("Job Description:", searchQuery, job_description);
+    router.push("/home/chat");
+    setSearchQuery("");
   };
 
   return (
     <div className="min-h-screen flex flex-col w-full">
-      <nav>
-      </nav>
+      <nav></nav>
       <main className="flex-1 flex flex-col items-center justify-center px-6">
         <div className="w-32 h-32 md:w-40 md:h-40 mb-12 flex items-center justify-center">
           <div className="w-full h-full bg-black rounded-full flex items-center justify-center">

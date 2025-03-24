@@ -45,13 +45,8 @@ export default function SignupForm() {
           headers: { "Content-Type": "application/json" },
         }
       );
-      const data = res.data;
-      localStorage.setItem("accessToken", data.access);
-      localStorage.setItem("refreshToken", data.refresh);
-      setIsSigned(true);
-      Cookies.set("isSigned", "true", { expires: 1 });
       toast.success("signing up successfully ✅");
-      router.push("/home");
+      router.push("/auth/login");
     } catch (err: any) {
       toast.error("Failed to fetch data ❌");
       setError(err.response?.data?.message || "Something went wrong!");

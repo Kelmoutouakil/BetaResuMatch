@@ -1,7 +1,24 @@
+"use client"
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function LandingPage() {
+
+  const RequestCrf = async() =>{
+
+    fetch("http://127.0.0.1:9000/user/getcsrf/",{
+        method: 'GET'
+    })
+    .then((response)=>response.json())
+    .then((data)=>{
+      console.log(data)
+      localStorage.setItem("crf",data.crfToken)
+        
+    })
+    .catch((error)=>{
+        console.log(error)
+    })
+  }   
   return (
     <div className="min-h-screen  flex flex-col">
       <nav className="w-full py-6 px-8 md:px-16 flex justify-between items-center">
@@ -14,12 +31,14 @@ export default function LandingPage() {
 
         <div className="flex space-x-4">
           <Link
+            onClick={RequestCrf}
             href="auth/login"
             className="w-[138px] h-[56px] text-[15px] font-bold rounded-full bg-[#2F2E2E] text-[#E2E2E2] hover:bg-gray-700 transition-colors flex items-center justify-center"
           >
             Login
           </Link>
           <Link
+          onClick={RequestCrf}
             href="auth/Sign-up"
             className="w-[138px] h-[56px] text-[15px] font-bold rounded-full bg-gray-100 text-[#2F2E2E] hover:bg-[#E2E2E2] transition-colors flex items-center justify-center"
           >

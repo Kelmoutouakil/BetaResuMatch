@@ -27,7 +27,7 @@ export default function SignupForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
+    let crftoken =  localStorage.getItem("crf")
     const formData = new FormData(e.currentTarget);
     const userData = {
       first_name: formData.get("firstname"),
@@ -42,7 +42,9 @@ export default function SignupForm() {
         "http://localhost:9000/user/create/",
         userData,
         {
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json" ,
+                  'X-CSRFToken' : crftoken
+          },
         }
       );
       toast.success("signing up successfully ✅");

@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-
+import api from "@/lib/axiosInstance";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -79,26 +79,21 @@ export default function ResumeViewer() {
     }
   };
   const handleClick = async () => {
-    console.log("Clicked");
     try {
       const formData = new FormData();
       for (let i = 0; i < resumes.length; i++) {
+        console.log("Appending file:", resumes[i].name);
         formData.append("files", resumes[i]);
       }
-      console.log(formData);
-      await axios.post(
-        "http://127.0.0.1:9000/api/upload/",
-        formData
-        // {
-        //   headers: {
-        //    "Content-Type": "application/json",
-        //   },
-        // }
-      );
+      const response =await api.post("upload/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("Upload Response:", response.data);
       toast.success("Files uploaded successfully");
       setOpen(false);
     } catch (err: any) {
-      console.error("Upload error:", err);
       toast.error("Can't upload files");
     }
   };

@@ -27,6 +27,7 @@ export default function LoginForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    let crftoken =  localStorage.getItem("crf")
     const formData = new FormData(e.currentTarget);
     const userData = {
       email: formData.get("email"),
@@ -39,7 +40,9 @@ export default function LoginForm() {
         "http://127.0.0.1:9000/api/token/",
         userData,
         {
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json",
+            'X-CSRFToken' : crftoken
+           },
         }
       );
 

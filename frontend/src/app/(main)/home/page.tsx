@@ -3,12 +3,14 @@
 import type React from "react";
 import { useState } from "react";
 import { Search, Upload, ArrowRight } from "lucide-react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import api from "@/lib/axiosInstance";
+import { toast } from "sonner";
+
+
 export default function SearchPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,17 +20,12 @@ export default function SearchPage() {
 
   const sendQuery = async (query: string) => {
     try {
-      const res = await axios.post(
-        " http://127.0.0.1:9000/api/JDupload/",
-        { job_description: query },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await api.post("JDupload/", { job_description: query, 'model' : '2' });
+      console.log("response : ",response.data)
       router.push("/home/chat");
       setSearchQuery("");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Something went wrong!");
+      toast.error(err.response?.data?.message || "Something went wrong!");
     } finally {
       setLoading(false);
     }

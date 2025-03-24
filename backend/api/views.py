@@ -16,6 +16,7 @@ import uuid,os,json
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def Upload(request):
+    print(" request here ",request.FILES.getlist('files'),flush=True)
     if request.FILES.get('files'):
         uploaded_files = request.FILES.getlist('files')
         for file in uploaded_files:
@@ -29,7 +30,7 @@ def Upload(request):
             text =  extract_text(resume.file.path)
             summary = summarize_text(text)
             parsed_resume = Parse_resume(text)
-            print("parsed --",parsed_resume,flush=True)
+            # print("parsed --",parsed_resume,flush=True)
             resume.parsed_resume = parsed_resume
             resume.name = parsed_resume.get('name')  
             resume.jobtitle = parsed_resume.get('job_title')
@@ -38,12 +39,8 @@ def Upload(request):
             resume.summary = summary
             resume.ExtractSkills = parsed_resume.get('skills')
             resume.save()
-            print(" name :  ------",resume.name,"<\n",flush=True)
-            print(" jobtitle :  ------",resume.jobtitle,"<\n",flush=True)
-            print(" INStutut :  ------",resume.Instutut_name,"<\n",flush=True)
-            print(" role :  ------",resume.desired_role,"<\n",flush=True)
-            print(" sumarry :  ------",resume.summary,"\n",flush=True)
-        return JsonResponse({'status':'File uploaded successefuly'},status=200)
+        serializer = ResumeDetailSerializer(Resume.objects.filter(user_id=request.user.id), many=True)
+        return Response(serializer.data)
     return JsonResponse({'error': 'No file uploaded'}, status=400)
     
 @api_view(['POST'])

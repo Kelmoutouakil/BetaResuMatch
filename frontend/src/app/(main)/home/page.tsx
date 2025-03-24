@@ -20,7 +20,8 @@ export default function SearchPage() {
 
   const sendQuery = async (query: string) => {
     try {
-      await api.post("api/JDupload/", { job_description: query });
+      const response = await api.post("JDupload/", { job_description: query, 'model' : '2' });
+      console.log("response : ",response.data)
       router.push("/home/chat");
       setSearchQuery("");
     } catch (err: any) {

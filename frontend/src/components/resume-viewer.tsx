@@ -82,11 +82,15 @@ export default function ResumeViewer() {
     try {
       const formData = new FormData();
       for (let i = 0; i < resumes.length; i++) {
+        console.log("Appending file:", resumes[i].name);
         formData.append("files", resumes[i]);
       }
-
-      await api.post("/api/upload/", formData);
-
+      const response =await api.post("upload/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("Upload Response:", response.data);
       toast.success("Files uploaded successfully");
       setOpen(false);
     } catch (err: any) {

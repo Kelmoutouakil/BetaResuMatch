@@ -99,7 +99,7 @@ def JDupload(request):
                 jd_embedding=get_jd_embedding(parsed_job_des) 
                 job_id = "ML engineer"
                 store_jd_embedding(job_id, jd_embedding)
-                rank_candidates(jd_embedding, exclude_id=job_id)
+                rank_candidates(jd_embedding, exclude_id=job_id, n=resumes.count())
                 ranked_resumes = resumes.order_by('-score')
                 serializer = ResumeSerializer(ranked_resumes, many=True)
                 return Response(serializer.data)

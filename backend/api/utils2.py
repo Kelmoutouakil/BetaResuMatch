@@ -4,7 +4,7 @@ from gensim.models.doc2vec import Doc2Vec
 from numpy.linalg import norm
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__),'job_matching', 'models', 'cv_job_maching.model')
-print("Mod " ,MODEL_PATH,flush=True)
+
 def preprocess_text(text):
         text = text.lower()
         text = re.sub('[^a-z]', ' ', text)

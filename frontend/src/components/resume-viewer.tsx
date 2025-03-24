@@ -85,7 +85,7 @@ export default function ResumeViewer() {
       for (let i = 0; i < resumes.length; i++) {
         formData.append("files[]", resumes[i]);
       }
-
+      console.log(formData);
       await axios.post(
         "http://127.0.0.1:9000/api/upload/",
         formData

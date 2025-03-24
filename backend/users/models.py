@@ -43,5 +43,25 @@ class User(AbstractUser):
         return self.email
     
 
+class Resume(models.Model):
     
+    user = models.ForeignKey(User, on_delete=models.CASCADE) 
+    file = models.FileField(upload_to='resumes/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    summary = models.TextField(null=True, blank=True)
+    MatchedSkills=models.TextField(null=True, blank=True)
+    MissingSkills=models.TextField(null=True, blank=True)
+    ExtractSkills=models.TextField(null=True, blank=True)
+    parsed_resume = models.JSONField(default=dict)
+    score = models.DecimalField(default=0,max_digits=5, decimal_places=2)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    jobtitle = models.CharField(max_length=255, blank=True, null=True)
+    Instutut_name = models.CharField(max_length=255, blank=True, null=True)
+    desired_role = models.CharField(max_length=255, blank=True, null=True)
+    class Meta:
+        db_table= 'resume'
+    
+    def __str__(self):
+        return self.name
+ 
 

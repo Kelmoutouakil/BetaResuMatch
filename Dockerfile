@@ -12,7 +12,7 @@ COPY  backend/requirement.txt .
 COPY script.sh /
 
 
-RUN ls && pip install --no-cache-dir -r requirement.txt
+RUN  pip install --no-cache-dir -r requirement.txt
 
 RUN chmod 777 /script.sh
 

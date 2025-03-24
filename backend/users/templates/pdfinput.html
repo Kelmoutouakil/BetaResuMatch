@@ -10,7 +10,7 @@
 <body>
     <form id="myform">
         <label for="file-upload">Upload a file:</label>
-        <input type="file" id="file-upload" name="file-upload" multiple accept=".pdf, .png, .txt" />
+        <input type="file" id="file-upload" name="file-upload" multiple accept=".pdf, .png, .jpeg" />
         <button type="submit">Submit</button>
     </form>
 </body>
@@ -39,8 +39,9 @@
 
         const formData = new FormData();
         for (let i = 0; i < files.length; i++) {
-            formData.append("files[]", files[i]); // Append each file
+            formData.append("files", files[i]); // Append each file
         }
+        console.log("forma : ",formData.files)
         fetch('http://127.0.0.1:9000/api/upload/', {
             method: 'POST',
             headers: {

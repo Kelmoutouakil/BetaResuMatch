@@ -1,11 +1,16 @@
 from PyPDF2 import PdfReader
-from PIL import Image
-import pytesseract
+from sklearn.metrics.pairwise import cosine_similarity
+from huggingface_hub import InferenceClient
 import google.generativeai as genai
 import json
+import numpy as np
 import os, re, time
 from .pinecone_integr import embedding_model, index
 import uuid
+from users.models import Resume
+
+repo_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+client = InferenceClient(model=repo_id, token=os.getenv('HUGGINGFACE_API_KEY'))
 def extract_text(file_path):
     if file_path.endswith('.pdf'):
         reader = PdfReader(file_path)
@@ -13,14 +18,10 @@ def extract_text(file_path):
         for page in reader.pages:
             text += page.extract_text()
         return text
-    elif file_path.endswitch(('.png', '.jpg', '.jpeg')):
-        image = Image.open(file_path)
-        text = pytesseract.image_to_string(image)
-        return text
     else:
         raise ValueError("Unsupport file format")
- 
-# load_dotenv()  
+
+
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 def Parse_resume(text):
     if not os.getenv("GEMINI_API_KEY"):
@@ -49,7 +50,10 @@ def Parse_resume(text):
                 "projects": "Key projects and contributions"
             }}
         ],
-        "skills": ["Skill1", "Skill2", "Skill3"]
+        "skills": ["Skill1", "Skill2", "Skill3"],
+        "job_title": "Current or most recent job title",
+        "latest_school": "Current or most recent school",
+        "desired_role": "Desired role or internship title"
     }}
 
     Only return JSON. Do not include explanations or text outside this JSON.
@@ -57,9 +61,8 @@ def Parse_resume(text):
     CV Text:
     {text}
     """
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-1.5-flash")
     response = model.generate_content(prompt)
-
     cleaned_text = re.sub(r"```json|```", "", response.text).strip()
 
     try:
@@ -68,22 +71,11 @@ def Parse_resume(text):
         print("API returned invalid JSON. Check response format.")
         parsed_info = {"error": "Invalid API response", "raw_response": cleaned_text}
     
-
     return parsed_info
 
 
+
 def parse_job_description(jd_text, retries=3):
-    """
-    Parse a job description into structured JSON format using the Gemini API.
-    Implements retry logic with exponential backoff to handle rate limits.
-
-    Parameters:
-        jd_text (str): The job description text to parse.
-        retries (int): Number of retry attempts for API failures.
-
-    Returns:
-        dict: Parsed job description as a dictionary or an error dictionary.
-    """
     if not os.getenv("GEMINI_API_KEY"):
         raise ValueError("Gemini API key is not set.")
 
@@ -105,22 +97,19 @@ def parse_job_description(jd_text, retries=3):
     {jd_text}
     """
 
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
     for attempt in range(retries):
         try:
-            # Generate response from Gemini API
             response = model.generate_content(prompt)
             cleaned_text = re.sub(r"```json|```", "", response.text).strip()
-
-            # Parse the cleaned text into JSON
             parsed_job = json.loads(cleaned_text)
             return parsed_job
 
         except json.JSONDecodeError:
             print(f"Attempt {attempt + 1}: API returned invalid JSON. Retrying...")
             if attempt < retries - 1:
-                wait_time = 2 ** attempt  # Exponential backoff
+                wait_time = 2 ** attempt  
                 print(f"Waiting for {wait_time} seconds before retrying...")
                 time.sleep(wait_time)
             else:
@@ -130,7 +119,7 @@ def parse_job_description(jd_text, retries=3):
         except Exception as e:
             print(f"Attempt {attempt + 1}: Error parsing job description - {e}")
             if attempt < retries - 1:
-                wait_time = 2 ** attempt  # Exponential backoff
+                wait_time = 2 ** attempt  
                 print(f"Waiting for {wait_time} seconds before retrying...")
                 time.sleep(wait_time)
             else:
@@ -140,10 +129,6 @@ def parse_job_description(jd_text, retries=3):
     return {"error": "All retry attempts failed", "raw_response": None}
 
 def get_jd_embedding(jd_data, retries=3):
-    """
-    Convert structured job description data into a meaningful text representation
-    and generate embeddings.
-    """
     text_representation = f"""
     Job Title: {jd_data.get('job_title', 'Unknown')}
     Required Skills: {', '.join(jd_data.get('required_skills', []))}
@@ -156,109 +141,168 @@ def get_jd_embedding(jd_data, retries=3):
         except Exception as e:
             print(f"Attempt {attempt + 1} failed: {e}")
             if attempt < retries - 1:
-                wait_time = 2 ** attempt  # Exponential backoff
+                wait_time = 2 ** attempt 
                 print(f"Retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
             else:
                 print("Failed to generate embedding after retries.")
                 return None
             
-def store_jd_embedding(jd_id=None, jd_embedding=None):
-    """
-    Store job description embeddings in Pinecone with error handling.
-    If no ID is provided, generate a UUID.
-    """
+def store_jd_embedding(jd_id,jd_embedding):
+
     if jd_id is None:
-        jd_id = str(uuid.uuid4())  # Generate a unique ID if not provided
+        jd_id = str(uuid.uuid4())  
     try:
         index.upsert([(jd_id, jd_embedding.tolist())])
-        print(f"Successfully stored JD embedding for ID: {jd_id}")
+        print(f"Successfully stored JD embedding f")
     except Exception as e:
-        print(f"Failed to store JD embedding for ID {jd_id}: {e}")
+        print(f"Failed to store JD embedding : {e}")
+
 
 
 def get_cv_embedding(cv_data, retries=3, timeout=10):
-    """
-    Convert structured CV data into text representation and generate embeddings with retry logic.
-    
-    Parameters:
-        cv_data (dict): Parsed CV data.
-        retries (int): Number of retry attempts for API failures.
-    
-    Returns:
-        tensor: Embedding tensor or None if failed.
-    """
-    text_representation = f"""
-    Name: {cv_data['personal_information'].get('name', 'Unknown')}
-    Education: {', '.join([edu['degree'] + ' from ' + edu['institution'] for edu in cv_data.get('education', [])])}
-    Work Experience: {', '.join([job['role'] + ' at ' + job['company'] for job in cv_data.get('work_experience', [])])}
-    Skills: {', '.join(cv_data.get('skills', []))}
-    """
 
+    if isinstance(cv_data, dict):
+
+        name = cv_data.get("name", "Unknown")
+        education = cv_data.get("education", [])
+        work_experience = cv_data.get("work_experience", [])
+        skills = cv_data.get("skills", [])
+        job_title = cv_data.get("job_title", "Unknown")
+        latest_school = cv_data.get("latest_school", "Unknown")
+        desired_role = cv_data.get("desired_role", "Unknown")
+        education_text = ", ".join([
+            f"{edu.get('degree', 'Unknown Degree')} from {edu.get('institution', 'Unknown Institution')}"
+            for edu in education
+        ])
+
+        work_experience_text = ", ".join([
+            f"{job.get('role', 'Unknown Role')} at {job.get('company', 'Unknown Company')}"
+            for job in work_experience
+        ])
+
+        skills_text = ", ".join(skills)
+
+        text_representation = f"""
+        Name: {name}
+        Job Title: {job_title}
+        Latest School: {latest_school}
+        Desired Role: {desired_role}
+        Education: {education_text}
+        Work Experience: {work_experience_text}
+        Skills: {skills_text}
+        """
+    elif isinstance(cv_data, list):
+        text_representation = f"Skills: {', '.join(cv_data)}"
+    else:
+        raise ValueError("Input must be a dictionary or a list of skills.")
     start_time = time.time()
     for attempt in range(retries):
         try:
-            return embedding_model.encode(text_representation, convert_to_tensor=True)
+            embedding = embedding_model.encode(text_representation, convert_to_tensor=True)
+            return embedding
         except Exception as e:
             print(f"Attempt {attempt + 1} failed: {e}")
             if attempt < retries - 1 and (time.time() - start_time) < timeout:
-                wait_time = 2 ** attempt  # Exponential backoff
+                wait_time = 2 ** attempt 
                 print(f"Retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
             else:
                 print("Failed to generate embedding after retries.")
                 return None
+            
+def clear_pinecone():
+    try:
+        index.delete(delete_all=True)  
+        print("Successfully cleared Pinecone index.")
+    except Exception as e:
+        print(f"Failed to clear Pinecone index: {e}")
 
 def store_cv_embedding(cv_id, cv_embedding):
-    """
-    Store candidate embeddings in Pinecone with error handling.
-    """
     try:
         index.upsert([(cv_id, cv_embedding.tolist())])
         print(f"Successfully stored CV embedding for ID: {cv_id}")
     except Exception as e:
         print(f"Failed to store CV embedding for ID {cv_id}: {e}")
-        
 
-def rank_candidates(jd_embedding, exclude_id=None):
+
+def summarize_text(text):
+    prompt = f"""
+    Summarize the following text into a concise and complete paragraph. Focus only on:
+    - Current role or academic status
+    - Educational background
+    - Relevant work experience
+    - Technical skills and expertise
+
+    Exclude any information about spoken languages, hobbies, or interests. Ensure the summary is well-structured and does not exceed 50 words:
+    
+    {text}
     """
-    Retrieve the top matching candidates from Pinecone and rank them.
-    Exclude a specific ID (e.g., the job description itself).
+    response = client.text_generation(prompt)
+    return response
 
-    Parameters:
-        jd_embedding (np.array): Embedding of the job description.
-        exclude_id (str): ID to exclude from ranking (e.g., job description ID).
-
-    Returns:
-        list: Ranked candidates with similarity scores.
-    """
+def rank_candidates(jd_embedding, exclude_id=None,n=20):
     try:
-        # Query Pinecone for similar embeddings
         results = index.query(
             vector=jd_embedding.tolist(),
-            top_k=10,
+            top_k=n,
             include_values=True
         )
-
-        # Filter out the excluded ID (e.g., job description)
-        ranked_candidates = []
         for match in results['matches']:
-            if match['id'] != exclude_id:  # Exclude the job description
-                similarity_percentage = round(match['score'] * 100, 2)  # Convert score to percentage
-                ranked_candidates.append({
-                    "candidate_id": match['id'],
-                    "similarity_score": similarity_percentage  # Keep as numerical value for sorting
-                })
+            if match['id'] != '-1' and  match['id'] != exclude_id  :
+                resume =  Resume.objects.get(id=match['id'])
 
-        # Sort candidates by similarity score in descending order
-        ranked_candidates = sorted(
-            ranked_candidates,
-            key=lambda x: x["similarity_score"],
-            reverse=True
-        )
-
-        return ranked_candidates
-
+                similarity_percentage = round(match['score'] * 100, 2)  
+                resume.score = similarity_percentage
+                resume.save()
     except Exception as e:
         print(f"Error ranking candidates: {e}")
-        return None
+
+
+def compare_skills(job_skills, candidate_skills):
+
+    job_skills_set = set(job_skills)
+    candidate_skills_set = set(candidate_skills)
+
+    matched_skills = list(job_skills_set.intersection(candidate_skills_set))
+    missing_skills = list(job_skills_set - candidate_skills_set)
+    extra_skills = list(candidate_skills_set - job_skills_set)
+
+    return {
+        "matched_skills": matched_skills,
+        "missing_skills": missing_skills,
+        "extra_skills": extra_skills
+    }
+
+def extract_skill_embeddings(skill_names, text_embeddings, skill_to_index):
+
+    skill_indices = [skill_to_index[skill] for skill in skill_names]
+    return text_embeddings[skill_indices]
+
+def compare_skill_embeddings(job_skills, candidate_skills, threshold=0.8):
+ 
+    job_skill_embeddings = embedding_model.encode(job_skills, convert_to_tensor=True)
+
+    candidate_skill_embeddings = embedding_model.encode(candidate_skills, convert_to_tensor=True)
+
+    similarity_matrix = cosine_similarity(job_skill_embeddings.cpu().numpy(), candidate_skill_embeddings.cpu().numpy())
+
+    matched_skills = []
+    missing_skills = []
+    extra_skills = candidate_skills.copy()
+
+    for i, job_skill in enumerate(job_skills):
+        max_similarity = np.max(similarity_matrix[i])
+        if max_similarity >= threshold:
+            matched_index = np.argmax(similarity_matrix[i])
+            matched_skill = candidate_skills[matched_index]
+            matched_skills.append((job_skill, matched_skill))
+            extra_skills.remove(matched_skill)
+        else:
+            missing_skills.append(job_skill)
+
+    return {
+        "matched_skills": matched_skills,
+        "missing_skills": missing_skills,
+        "extra_skills": extra_skills
+    }

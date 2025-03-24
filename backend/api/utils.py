@@ -60,7 +60,7 @@ def Parse_resume(text):
     CV Text:
     {text}
     """
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-1.5-flash")
     response = model.generate_content(prompt)
 
     cleaned_text = re.sub(r"```json|```", "", response.text).strip()
@@ -109,7 +109,7 @@ def parse_job_description(jd_text, retries=3):
     {jd_text}
     """
 
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
     for attempt in range(retries):
         try:

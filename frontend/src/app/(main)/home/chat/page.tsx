@@ -44,7 +44,7 @@ export default function Home() {
     <main className="min-h-screen p-6 w-full">
       <div className="size-full">
         <div className="mb-10">
-          <SearchBar />
+          <SearchBar setCandidates={setCandidates}/>
         </div>
 
         <h1 className="text-2xl font-bold text-slate-800 mb-6">Results</h1>

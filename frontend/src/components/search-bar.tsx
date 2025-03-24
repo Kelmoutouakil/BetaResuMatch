@@ -9,8 +9,13 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import api from "@/lib/axiosInstance";
 
-export default function SearchBar() {
+interface SearchBarProps {
+  setCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>;
+}
+
+export default function SearchBar({ setCandidates }: SearchBarProps) {
   const [showFilter, setShowFilter] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("skills");
@@ -18,21 +23,44 @@ export default function SearchBar() {
     setShowFilter(!showFilter);
   }
 
-  function handleSearch() {
-    // Send to backend: searchQuery and filterType
+  const handleSearch = async () => {
     console.log("Searching for:", searchQuery, "Filter by:", filterType);
-    // Here you would make your API call, e.g.:
-    // await fetch('/api/search', {
-    //   method: 'POST',
-    //   body: JSON.stringify({ query: searchQuery, filterBy: filterType }),
-    //   headers: { 'Content-Type': 'application/json' }
-    // })
-  }
+
+    try {
+      console.log("Making search request");
+      let apiEndpoint = "";
+      let requestData = {};
+      if (filterType === "skill") {
+        apiEndpoint = "http://127.0.0.1:9000/api/upload/filter/";
+        requestData = { skill: searchQuery };
+      } else if (filterType === "job") {
+        apiEndpoint = "http://127.0.0.1:9000/api/filterJob/";
+        requestData = { jobtitle: searchQuery };
+      } else {
+        console.log("Invalid filter type");
+        return;
+      }
+
+      const res = await api.post(apiEndpoint, requestData);
+      setCandidates(res.data);
+      console.log("Response:", res.data);
+
+      console.log("Request sent successfully");
+    } catch (error) {
+      console.error("Error while making search request:", error);
+    }
+  };
+
   return (
     <div className="relative w-full max-w-2xl mx-auto ">
       <input
         type="text"
         placeholder="Search by skills, and experience ..."
+        value={searchQuery}
+        onChange={(e) => {
+          console.log(e.target.value);
+          setSearchQuery(e.target.value);
+        }}
         className="w-full bg-[#2F2E2E] text-white rounded-full shadow-2xl py-3 px-6 pr-12 focus:outline-none focus:ring-2 focus:ring-[#3F788A]"
       />
       {/* <button className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-[#89A8B2] p-2 rounded-full">

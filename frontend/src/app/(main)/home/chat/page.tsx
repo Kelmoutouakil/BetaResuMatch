@@ -58,13 +58,13 @@ export default function Home() {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#89A8B2]"></div>
           </div>
         ) : candidates.length > 0 ? (
-          <div className="flex flex-wrap gap-8 size-full ml-[-25px]">
+          <div className="flex flex-wrap items-center justify-center  gap-4 size-full ">
             {candidates.map((candidate, index) => (
               <CandidateCard key={index} candidate={candidate} />
             ))}
           </div>
         ) : (
-          <div className="text-center text-gray-500 py-10">
+          <div className="flex text-center text-gray-500 py-10">
             {job_description
               ? "No candidates found"
               : "Please enter a job description to find candidates"}

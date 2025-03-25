@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 
 import { useState } from "react";
@@ -65,8 +63,7 @@ export default function SearchBar({ setCandidates }: SearchBarProps) {
       const res = await api.post(apiEndpoint, requestData);
       setCandidates(res.data);
     } catch (error) {
-      console.error("Error while making search request:", error);
-      toast.error("Failed to search candidates");
+      toast.error("Error while making search request:", error);
     } finally {
       setIsSearching(false);
     }
@@ -79,7 +76,7 @@ export default function SearchBar({ setCandidates }: SearchBarProps) {
   };
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto">
+    <div className="relative w-full max-w-2xl mx-auto ">
       <input
         type="text"
         placeholder="Search by skills, and experience ..."

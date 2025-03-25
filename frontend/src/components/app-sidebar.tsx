@@ -1,3 +1,4 @@
+"use client";
 import { RiChatNewFill } from "react-icons/ri";
 import { IoLogOut } from "react-icons/io5";
 import Cookies from "js-cookie";
@@ -20,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ResumeViewer from "./resume-viewer";
-
+import CandidateList from "./Candidates-Header";
 const items = [
   {
     title: "New Chat",
@@ -33,7 +34,7 @@ export function AppSidebar() {
   const handleClick = () => {
     setIsSigned(false);
     Cookies.remove("isSigned");
-    window.location.href = "/login"; // Redirect after logout
+    window.location.href = "/login";
   };
   return (
     <Sidebar className="bg-transparent">
@@ -80,6 +81,7 @@ export function AppSidebar() {
                       </span>
                     </a>
                   </SidebarMenuButton>
+                  {/* <CandidateList /> */}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

@@ -27,7 +27,7 @@ export default function LoginForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    let crftoken =  localStorage.getItem("crf")
+    const crftoken = localStorage.getItem("crf");
     const formData = new FormData(e.currentTarget);
     const userData = {
       email: formData.get("email"),
@@ -40,9 +40,10 @@ export default function LoginForm() {
         "http://127.0.0.1:9000/api/token/",
         userData,
         {
-          headers: { "Content-Type": "application/json",
-            'X-CSRFToken' : crftoken
-           },
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": crftoken,
+          },
         }
       );
 
@@ -103,16 +104,13 @@ export default function LoginForm() {
         </button>
 
         <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
-        <div className="text-lg gap-5 font-bold text-neutral-800 dark:text-neutral-200 flex flex-col items-center justify-center ">
-          <h1> Don't have an account? </h1>
-          <Link
-            href="/auth/Sign-up"
-            className="relative block m-auto text-center w-full py-1 px-5 rounded-md border-2 font-medium text-black hover:text-xl shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset] hover:bg-gradient-to-bl transition-all duration-300"
-          >
-            Sign up
-          </Link>
-        </div>
       </form>
+      <div className="text-lg gap-5 font-bold text-neutral-800 dark:text-neutral-200 flex flex-col items-center justify-center">
+        <h1>Don't have an account?</h1>
+        <button className="w-full py-1 px-5 rounded-md border-2 font-medium text-black hover:text-xl shadow-lg hover:bg-gradient-to-bl transition-all duration-300">
+          <a href="/auth/Sign-up">Sign-up</a>
+        </button>
+      </div>
     </div>
   );
 }

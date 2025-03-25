@@ -14,7 +14,6 @@ export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  // Initialize searchQuery from job_description if it exists
   useEffect(() => {
     if (job_description) {
       setSearchQuery(job_description)
@@ -32,16 +31,13 @@ export default function SearchPage() {
     setIsLoading(true)
 
     try {
-      // Save to context (which should persist to localStorage via the context)
       setJobDescription(searchQuery)
 
-      // Pre-fetch candidates before navigation to ensure data is available
       await api.post("JDupload/", {
         job_description: searchQuery,
         model: "2",
       })
 
-      // Navigate to the chat page
       router.push("/home/chat")
     } catch (error) {
       console.error("Error fetching candidates:", error)

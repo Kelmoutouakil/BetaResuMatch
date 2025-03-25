@@ -19,7 +19,6 @@ export default function SignupForm() {
     password1: "",
     password2: "",
   });
-  const { setIsSigned } = useRecruiter();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -27,7 +26,7 @@ export default function SignupForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    let crftoken =  localStorage.getItem("crf")
+    const crftoken =  localStorage.getItem("crf")
     const formData = new FormData(e.currentTarget);
     const userData = {
       first_name: formData.get("firstname"),
@@ -137,13 +136,13 @@ export default function SignupForm() {
         </button>
 
         <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
+      </form>
         <div className="text-lg gap-5 font-bold text-neutral-800 dark:text-neutral-200 flex flex-col items-center justify-center">
           <h1>Already have an account?</h1>
           <button className="w-full py-1 px-5 rounded-md border-2 font-medium text-black hover:text-xl shadow-lg hover:bg-gradient-to-bl transition-all duration-300">
-            Login
+            <a href="/auth/login">Login</a>
           </button>
         </div>
-      </form>
     </div>
   );
 }

@@ -50,6 +50,7 @@ class Resume(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     summary = models.TextField(null=True, blank=True)
     MatchedSkills=models.TextField(null=True, blank=True)
+    feedback=models.TextField(null=True, blank=True)
     MissingSkills=models.TextField(null=True, blank=True)
     ExtractSkills=models.TextField(null=True, blank=True)
     parsed_resume = models.JSONField(default=dict)

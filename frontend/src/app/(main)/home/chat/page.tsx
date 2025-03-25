@@ -22,6 +22,7 @@ export default function Home() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const { job_description } = useRecruiter();
   const [isLoading, setIsLoading] = useState(false);
+  const { module } = useRecruiter();
   useEffect(() => {
     console.log("Job Description:", job_description);
     if (job_description) {
@@ -30,7 +31,7 @@ export default function Home() {
         try {
           const response = await api.post("JDupload/", {
             job_description: job_description,
-            model: "2",
+            model: module,
           });
           console.log("response : ", response.data);
           setCandidates(response.data);

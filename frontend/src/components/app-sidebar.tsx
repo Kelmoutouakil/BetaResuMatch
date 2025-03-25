@@ -36,6 +36,7 @@ export function AppSidebar() {
     Cookies.remove("isSigned");
     window.location.href = "/login";
   };
+  const { setModule } = useRecruiter();
   return (
     <Sidebar className="bg-transparent">
       <SidebarHeader className="bg-[#3F788A52]">
@@ -56,10 +57,10 @@ export function AppSidebar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
                 <DropdownMenuItem>
-                  <span>example 1</span>
+                  <span onClick={() => {setModule(1)}}>Module 1</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <span>Example 2</span>
+                  <span onClick={() => {setModule(2)}}>Module 2</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -81,7 +82,7 @@ export function AppSidebar() {
                       </span>
                     </a>
                   </SidebarMenuButton>
-                  {/* <CandidateList /> */}
+                  <CandidateList />
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

@@ -14,7 +14,6 @@ def store_cv_embedding(cv_id, cv_embedding):
 def store_jd_embedding(jd_id=None, jd_embedding=None):
     """
     Store job description embeddings in Pinecone with error handling.
-    If no ID is provided, generate a UUID.
     """
     if jd_id is None:
         jd_id = str(uuid.uuid4())  # Generate a unique ID if not provided

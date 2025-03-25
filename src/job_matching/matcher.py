@@ -20,7 +20,7 @@ def rank_candidates(jd_embedding, exclude_id=None):
             include_values=True
         )
 
-        # Filter out the excluded ID (e.g., job description)
+        # Filter out the excluded ID (job description)
         ranked_candidates = []
         for match in results['matches']:
             if match['id'] != exclude_id:  # Exclude the job description

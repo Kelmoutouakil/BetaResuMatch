@@ -1,8 +1,8 @@
+#Second approach; similarity search
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from scripts.pinecone_setup import embedding_model
 
-#second approach
 def compare_skill_embeddings(job_skills, candidate_skills, threshold=0.8):
     """
     Compare job skills and candidate skills using embeddings with robust error handling.

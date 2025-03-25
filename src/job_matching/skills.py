@@ -1,4 +1,4 @@
-#first approach:
+#first approach:keyword search
 def compare_skills(job_skills, candidate_skills):
     """
     Compare skills between a job description and a candidate profile.

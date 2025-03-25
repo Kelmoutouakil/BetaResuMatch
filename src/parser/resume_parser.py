@@ -47,11 +47,11 @@ def parse_cv(cv_text):
     CV Text:
     {cv_text}
     """
-    model = genai.GenerativeModel("gemini-1.5-flash")  ##flush is better for this task
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    # Generate response from Gemini API
     response = model.generate_content(prompt)
-
     cleaned_text = re.sub(r"```json|```", "", response.text).strip()
-
+    # Parse the cleaned text into JSON
     try:
         parsed_info = json.loads(cleaned_text)
     except json.JSONDecodeError:

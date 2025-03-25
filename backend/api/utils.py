@@ -12,6 +12,7 @@ from users.models import Resume
 repo_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 client = InferenceClient(model=repo_id, token=os.getenv('HUGGINGFACE_API_KEY'))
 def extract_text(uploaded_file):
+    print("------------extract-----",flush=True)
 #     if file_path.endswith('.pdf'):
 #         reader = PdfReader(file_path)
 #         text = ''
@@ -29,11 +30,12 @@ def extract_text(uploaded_file):
         extracted_text = page.extract_text()
         if extracted_text:
             text += extracted_text + "\n"
-
+    print("-------text---",text,flush=True)
     return text
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 def Parse_resume(text):
+    print("*****************",flush=True)
     if not os.getenv("GEMINI_API_KEY"):
         raise ValueError("Gemini API key is not set.")
     prompt = f"""
@@ -77,8 +79,10 @@ def Parse_resume(text):
 
     try:
         parsed_info = json.loads(cleaned_text)
+        print("parsed info",parsed_info,flush=True)
     except json.JSONDecodeError:
-        print("API returned invalid JSON. Check response format.")
+        print("---error: from pars resume ---",flush=True)
+        print("API returned invalid JSON. Check response format.",flush=True)
         parsed_info = {"error": "Invalid API response", "raw_response": cleaned_text}
     
     return parsed_info

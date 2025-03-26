@@ -23,7 +23,6 @@ export default function CandidateList() {
       setIsLoading(true)
       try {
         const response = await api.get("getcandidat/")
-        console.log("response : ", response.data)
         setCandidates(response.data)
       } catch (err) {
         toast.error(err.response?.data?.message || "Something went wrong!")
@@ -55,7 +54,7 @@ export default function CandidateList() {
               {candidates.map((candidate, index) => (
                 <div
                   key={index}
-                  className={`py-3 px-2 border-b border-gray-500 cursor-pointer transition-colors`}
+                  className={`py-5 px-8 border-b border-gray-500 cursor-pointer transition-colors`}
                 >
                   <div className="text-black text-lg font-medium">
                     {candidate.name} 

@@ -17,9 +17,9 @@ interface Candidate {
   name: string;
   title: string;
   score: string;
-  extractSkills: string[];
-  matchedSkills: string[];
-  missingSkills: string[];
+  extractSkills: string;
+  MatchedSkills: string;
+  MissingSkills: string;
   file: string;
   summary: string;
 }

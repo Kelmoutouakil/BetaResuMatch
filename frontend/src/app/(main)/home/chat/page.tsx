@@ -25,17 +25,12 @@ interface StatisticsData {
 }
 
 export default function Home() {
-  const router = useRouter();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const { job_description } = useRecruiter();
   const [isLoading, setIsLoading] = useState(false);
   const { module } = useRecruiter();
   const [statisticsOpen, setStatisticsOpen] = useState(false)
   const [statisticsData, setStatisticsData] = useState<StatisticsData | null>(null)
   useEffect(() => {
-    // if(!job_description)
-    //   router.push("/home");
-
       const sendQuery = async () => {
         setIsLoading(true)
         try {
@@ -71,7 +66,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen p-6 w-full">
-      <div className="size-full">
+      <div className="size-full ml-[-20px]">
         <div className="mb-10"><SearchBar setCandidates={setCandidates} /></div>
 
         <div className="w-full h-fit flex justify-between ">
@@ -85,14 +80,14 @@ export default function Home() {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#89A8B2]"></div>
           </div>
         ) : candidates.length > 0 ? (
-          <div className="flex flex-wrap items-center justify-center gap-4 size-full ">
+          <div className="flex flex-wrap items-center justify-center gap-4 size-full">
             {candidates.map((candidate, index) => (
               <CandidateCard key={index} candidate={candidate} />
             ))}
           </div>
         ) : (
           <div className="flex text-center text-gray-500 py-10">
-            {job_description ? "No candidates found" : "Please enter a job description to find candidates"}
+            No candidates found, Upload REsumes and write the job description to get started
           </div>
         )}
       </div>

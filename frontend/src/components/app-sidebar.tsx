@@ -60,7 +60,7 @@ export function AppSidebar() {
                   <span onClick={() => {setModule("1")}}>Beta 1</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <span onClick={() => {setModule("2")}}>Beta2 2</span>
+                  <span onClick={() => {setModule("2")}}>Beta 2</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

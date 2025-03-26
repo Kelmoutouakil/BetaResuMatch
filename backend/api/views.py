@@ -133,51 +133,6 @@ def get_resume_detail(request):
         return Response({"detail": "Resume not found."}, status=404)
     
 
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def filter_resumes_by_extract_skills(request):
-#     print("request body ",json.loads(request.body))
-#     skill = json.loads(request.body).get('skill') 
-#     print("-----------------",skill,flush=True)
-#     if skill:
-#         resumes = Resume.objects.filter(user_id=request.user.id)
-#         for resume in resumes:
-#             resume.ExtractSkills = [skil.upper() for skil in resume.ExtractSkills]
-#             resume.save() 
-#         skill = skill.upper()
-#         r=Resume.objects.filter(user_id=request.user.id, ExtractSkills__contains=skill)                           
-#         print("RESUMES HERE",skill,flush=True)
-#         serializer = ResumeSerializer(r, many=True)
-#         print("data ",serializer.data,flush=True)
-#         return Response(serializer.data)
-#     else:
-#         return JsonResponse({"error": 'bad request'},status=400)
-
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def filter_resumes_by_jobtitle(request):
-#     try:
-#         request_data = json.loads(request.body)
-#         print("Request body:", request_data, flush=True)
-#         jobtitle = request_data.get('jobtitle')
-#         if jobtitle:
-#             jobtitle = jobtitle.strip().lower()
-#             print(f"Normalized job title being searched: {jobtitle}", flush=True)
-#             resumes = Resume.objects.filter(
-#                 user_id=request.user.id,
-#                 jobtitle__iexact=jobtitle
-#             )
-#             if resumes.exists():
-#                 serializer = ResumeSerializer(resumes, many=True)
-#                 print("Serialized data:", serializer.data, flush=True)
-#                 return Response(serializer.data)
-#             else:
-#                 return JsonResponse({"error": "No resumes found matching the job title"}, status=404)
-#         else:
-#             return JsonResponse({"error": "Job title not provided"}, status=400)
-
-#     except json.JSONDecodeError:
-#         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

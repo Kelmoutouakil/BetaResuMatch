@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 MEDIA_URL = '/media/'  # URL to access files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
-
+APPEND_SLASH = True
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

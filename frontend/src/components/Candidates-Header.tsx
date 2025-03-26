@@ -23,7 +23,7 @@ export default function CandidateList() {
     const fetchCandidates = async () => {
       setIsLoading(true)
       try {
-        const response = await api.get("Details/")
+        const response = await api.get("getcandidat/")
         console.log("response : ", response.data)
         setCandidates(response.data)
       } catch (err) {

@@ -28,7 +28,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, FileText, Upload, X } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import axios from "axios";
 
 export default function ResumeViewer() {
   const [resumes, setResumes] = useState<File[]>([]);

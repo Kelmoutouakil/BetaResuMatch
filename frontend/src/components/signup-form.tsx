@@ -1,13 +1,26 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // Import router for navigation
+import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import axios from "axios";
 import { toast } from "sonner";
-import { useRecruiter } from "@/Context/RecruiterContext";
-import Cookies from "js-cookie";
+import { z } from "zod";
+
+const signupSchema = z
+  .object({
+    firstname: z.string().min(2, "First name must be at least 2 characters"),
+    lastname: z.string().min(2, "Last name must be at least 2 characters"),
+    email: z.string().email("Invalid email address"),
+    password1: z.string().min(8, "Password must be at least 8 characters"),
+    password2: z.string().min(8, "Password must be at least 8 characters"),
+  })
+  .refine((data) => data.password1 === data.password2, {
+    message: "Passwords don't match",
+    path: ["password2"],
+  });
+
 export default function SignupForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -19,37 +32,52 @@ export default function SignupForm() {
     password1: "",
     password2: "",
   });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const crftoken =  localStorage.getItem("crf")
-    const formData = new FormData(e.currentTarget);
-    const userData = {
-      first_name: formData.get("firstname"),
-      last_name: formData.get("lastname"),
-      email: formData.get("email"),
-      password1: formData.get("password"),
-      password2: formData.get("password"),
-    };
+
     try {
-      console.log(userData);
-      const res = await axios.post(
+      signupSchema.parse(formData);
+
+      const crftoken = localStorage.getItem("crf");
+
+      const userData = {
+        first_name: formData.firstname,
+        last_name: formData.lastname,
+        email: formData.email,
+        password1: formData.password1,
+        password2: formData.password2,
+      };
+
+      console.log("Sending user data:", userData);
+
+      const response = await axios.post(
         "http://localhost:9000/user/create/",
         userData,
         {
-          headers: { "Content-Type": "application/json" ,
-                  'X-CSRFToken' : crftoken
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": crftoken || "",
           },
         }
       );
-      toast.success("signing up successfully ✅");
+
+      console.log("Response:", response);
+      toast.success("Signed up successfully ✅");
       router.push("/auth/login");
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Something went wrong!");
+
+      if (err instanceof z.ZodError) {
+        setError(err.errors[0].message);
+      } else {
+        toast.error(err.response?.data?.message || "Something went wrong!");
+      }
     } finally {
       setLoading(false);
     }
@@ -76,8 +104,9 @@ export default function SignupForm() {
               name="firstname"
               placeholder="Tyler"
               type="text"
-              required
+              value={formData.firstname}
               onChange={handleChange}
+              required
             />
           </LabelInputContainer>
           <LabelInputContainer>
@@ -87,8 +116,9 @@ export default function SignupForm() {
               name="lastname"
               placeholder="Durden"
               type="text"
-              required
+              value={formData.lastname}
               onChange={handleChange}
+              required
             />
           </LabelInputContainer>
         </div>
@@ -99,30 +129,33 @@ export default function SignupForm() {
             name="email"
             placeholder="projectmayhem@fc.com"
             type="email"
-            required
+            value={formData.email}
             onChange={handleChange}
+            required
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password1">Password</Label>
           <Input
-            id="password"
-            name="password"
+            id="password1"
+            name="password1"
             placeholder="••••••••"
             type="password"
-            required
+            value={formData.password1}
             onChange={handleChange}
+            required
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password2">Confirm Password</Label>
           <Input
-            id="password"
-            name="password"
+            id="password2"
+            name="password2"
             placeholder="••••••••"
             type="password"
-            required
+            value={formData.password2}
             onChange={handleChange}
+            required
           />
         </LabelInputContainer>
 
@@ -137,12 +170,12 @@ export default function SignupForm() {
 
         <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
       </form>
-        <div className="text-lg gap-5 font-bold text-neutral-800 dark:text-neutral-200 flex flex-col items-center justify-center">
-          <h1>Already have an account?</h1>
-          <button className="w-full py-1 px-5 rounded-md border-2 font-medium text-black hover:text-xl shadow-lg hover:bg-gradient-to-bl transition-all duration-300">
-            <a href="/auth/login">Login</a>
-          </button>
-        </div>
+      <div className="text-lg gap-5 font-bold text-neutral-800 dark:text-neutral-200 flex flex-col items-center justify-center">
+        <h1>Already have an account?</h1>
+        <button className="w-full py-1 px-5 rounded-md border-2 font-medium text-black hover:text-xl shadow-lg hover:bg-gradient-to-bl transition-all duration-300">
+          <a href="/auth/login">Login</a>
+        </button>
+      </div>
     </div>
   );
 }

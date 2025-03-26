@@ -9,16 +9,14 @@ import api from "@/lib/axiosInstance"
 import { toast } from "sonner"
 
 export default function SearchPage() {
-  const { job_description, setJobDescription } = useRecruiter()
+  const { job_description, setJobDescription, module } = useRecruiter()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  // useEffect(() => {
-  //   if (job_description) {
-  //     setSearchQuery(job_description)
-  //   }
-  // }, [job_description ])
+  useEffect(() => {
+      setSearchQuery(job_description)
+  }, [job_description])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,26 +29,24 @@ export default function SearchPage() {
     setIsLoading(true)
 
     setJobDescription(searchQuery);
+    
+    router.push("/home/chat")
+    // try {
+    //   console.log("JDupload/", job_description, module)
+    //   await api.post("JDupload/", {
+    //     job_description: job_description,
+    //     model: module,
+    //   })
 
-    try {
-
-      await api.post("JDupload/", {
-        job_description: searchQuery,
-        model: "2",
-      })
-
-      router.push("/home/chat")
-    } catch (error) {
-      console.error("Error fetching candidates:", error)
-      toast.error("Failed to process your request. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
+    // } catch (error) {
+    //   toast.error("Failed to process your request. Please try again.")
+    // } finally {
+    //   setIsLoading(false)
+    // }
   }
 
   return (
     <div className="min-h-screen flex flex-col w-full">
-      <nav className="p-4 flex justify-end">{/* You can add navigation items here if needed */}</nav>
 
       <main className="flex-1 flex flex-col items-center justify-center px-6">
         <div className="w-32 h-32 md:w-40 md:h-40 mb-12 flex items-center justify-center">

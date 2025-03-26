@@ -14,11 +14,11 @@ import {
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
 
 // Update the chartData to reflect the score as a percentage of 100
-export function Rating({ score }: { score: number }) {
-  const normalizedScore = Math.max(0, Math.min(100, score));
+export function Rating({ score }: { score: string }) {
+  // const normalizedScore = Math.max(0, Math.min(100, score));
 
   const chartData = [
-    { browser: "safari", visitors: normalizedScore, fill: "var(--color-safari)" },
+    { browser: "safari", visitors: score, fill: "var(--color-safari)" },
   ];
 
   const chartConfig = {

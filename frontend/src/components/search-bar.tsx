@@ -17,7 +17,7 @@ interface Candidate {
   name: string;
   title: string;
   score: string;
-  extractSkills: string;
+  ExtractSkills: string;
   MatchedSkills: string;
   MissingSkills: string;
   file: string;
@@ -76,7 +76,7 @@ export default function SearchBar({ setCandidates }: SearchBarProps) {
   };
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto ">
+    <div className={"relative w-full max-w-2xl mx-auto "}>
       <input
         type="text"
         placeholder="Search by skills, and experience ..."

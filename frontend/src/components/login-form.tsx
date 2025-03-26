@@ -1,15 +1,21 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useRecruiter } from "@/Context/RecruiterContext";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -19,6 +25,7 @@ export default function LoginForm() {
     password: "",
   });
   const { setIsSigned } = useRecruiter();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -27,14 +34,20 @@ export default function LoginForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const crftoken = localStorage.getItem("crf");
-    const formData = new FormData(e.currentTarget);
-    const userData = {
-      email: formData.get("email"),
-      password: formData.get("password"),
-    };
+
     try {
-      console.log("userData", userData);
+      // Validate the form data using the schema
+      loginSchema.parse(formData);
+
+      const crftoken = localStorage.getItem("crf");
+
+      // Use the state data instead of FormData
+      const userData = {
+        email: formData.email,
+        password: formData.password,
+      };
+
+      console.log("Attempting login with:", { email: userData.email });
 
       const res = await axios.post(
         "http://127.0.0.1:9000/api/token/",
@@ -42,25 +55,37 @@ export default function LoginForm() {
         {
           headers: {
             "Content-Type": "application/json",
-            "X-CSRFToken": crftoken,
+            "X-CSRFToken": crftoken || "",
           },
         }
       );
 
       const data = res.data;
+
       localStorage.setItem("accessToken", data.access);
       localStorage.setItem("refreshToken", data.refresh);
-      toast.success("logging in successfully ✅");
+
+      toast.success("Logged in successfully ✅");
       setIsSigned(true);
       Cookies.set("isSigned", "true", { expires: 1 });
       router.push("/home");
     } catch (err: any) {
-      toast.error("Failed to fetch data ❌");
-      setError(err.response?.data?.detail || "Invalid credentials");
+      if (err instanceof z.ZodError) {
+        setError(err.errors[0].message);
+      } else if (err.response?.status === 401) {
+        setError("Invalid email or password");
+      } else if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+        toast.error(err.response.data.detail);
+      } else {
+        setError("Failed to login. Please try again.");
+        toast.error("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className="shadow-input mx-auto w-full max-w-md rounded-none p-4 md:rounded-2xl md:p-8 dark:bg-[#3F788A8F]">
       <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
@@ -69,7 +94,8 @@ export default function LoginForm() {
       <p className="mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300">
         Login to continue
       </p>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
       <form className="my-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
@@ -77,12 +103,15 @@ export default function LoginForm() {
           <Input
             id="email"
             name="email"
-            placeholder="projectmayhem@fc.com"
+            placeholder="your@email.com"
             type="email"
-            required
+            value={formData.email}
             onChange={handleChange}
+            required
+            aria-describedby={error ? "email-error" : undefined}
           />
         </LabelInputContainer>
+
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
           <Input
@@ -90,26 +119,58 @@ export default function LoginForm() {
             name="password"
             placeholder="••••••••"
             type="password"
-            required
+            value={formData.password}
             onChange={handleChange}
+            required
+            aria-describedby={error ? "password-error" : undefined}
           />
         </LabelInputContainer>
 
         <button
-          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
+          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset] disabled:opacity-50 disabled:cursor-not-allowed"
           type="submit"
+          disabled={loading}
         >
-          {loading ? "Logging in..." : "Login →"}
+          {loading ? (
+            <span className="flex items-center justify-center">
+              <svg
+                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Logging in...
+            </span>
+          ) : (
+            "Login →"
+          )}
           <BottomGradient />
         </button>
 
         <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
       </form>
+
       <div className="text-lg gap-5 font-bold text-neutral-800 dark:text-neutral-200 flex flex-col items-center justify-center">
         <h1>Don't have an account?</h1>
-        <button className="w-full py-1 px-5 rounded-md border-2 font-medium text-black hover:text-xl shadow-lg hover:bg-gradient-to-bl transition-all duration-300">
-          <a href="/auth/Sign-up">Sign-up</a>
-        </button>
+        <Link href="/auth/Sign-up" className="w-full">
+          <button className="w-full py-1 px-5 rounded-md border-2 font-medium text-black hover:text-xl shadow-lg hover:bg-gradient-to-bl transition-all duration-300">
+            Sign up
+          </button>
+        </Link>
       </div>
     </div>
   );

@@ -28,13 +28,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, FileText, Upload, X } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { Loader } from "lucide-react";
 
 export default function ResumeViewer() {
   const [resumes, setResumes] = useState<File[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  //   const { toast } = useToast()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -78,22 +79,23 @@ export default function ResumeViewer() {
     }
   };
   const handleClick = async () => {
+    setIsLoading(true);
     try {
       const formData = new FormData();
       for (let i = 0; i < resumes.length; i++) {
-        console.log("Appending file:", resumes[i].name);
         formData.append("files", resumes[i]);
       }
-      const response =await api.post("upload/", formData, {
+      await api.post("upload/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log("Upload Response:", response.data);
       toast.success("Files uploaded successfully");
       setOpen(false);
     } catch (err: any) {
       toast.error("Can't upload files");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -194,7 +196,13 @@ export default function ResumeViewer() {
               Close
             </Button>
             {resumes.length > 0 && (
-              <Button onClick={handleClick}>Save Selection</Button>
+              <Button onClick={handleClick}>
+                {isLoading ? (
+                  <Loader className="w-5 h-5 text-white animate-spin" />
+                ) : (
+                  "Save Selection"
+                )}
+              </Button>
             )}
           </DialogFooter>
         </DialogContent>

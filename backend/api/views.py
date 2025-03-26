@@ -67,59 +67,68 @@ def Upload(request):
 @permission_classes([IsAuthenticated])
 def JDupload(request):
     data = json.loads(request.body)
-    user =  request.user
+    print("Incoming data:", data, flush=True)
+    user = request.user
     if not data.get('job_description'):
-        return JsonResponse({'error':'job describtion not uploaded'}, status=400)
+        return JsonResponse({'error': 'Job description not uploaded'}, status=400)
+    
     resumes = Resume.objects.filter(user_id=user.id)
     if not resumes:
-        return JsonResponse({'error':'No resumes uploaded!'}, status=404)
-    parsed_job_des=parse_job_description(data.get('job_description'))
+        return JsonResponse({'error': 'No resumes uploaded!'}, status=404)
+    
+    parsed_job_des = parse_job_description(data.get('job_description'))
     jd_skills = parsed_job_des.get("required_skills", [])
-
     if data.get('model'):
-            if data.get('model')== '1':
+        if str(data.get('model')) == '1':
+            for resume in resumes:
+                text = extract_text(resume.file)
+                print(">>1>>>", resume.parsed_resume, "<<<<<", flush=True)
+
+                skill_comparison_result = compare_skill_embeddings(jd_skills, resume.parsed_resume.get("skills", []), threshold=0.8)
+                resume.MatchedSkills = skill_comparison_result["matched_skills"]
+                resume.MissingSkills = skill_comparison_result["missing_skills"]
+                resume.ExtractSkills = skill_comparison_result["extra_skills"]
+                resume.save()
+                
+                score = match_resume_to_jd(text, data.get('job_description'))
+                print("score is ---", score, " name : ", resume.file.path, flush=True)
+                resume.score = score
+                resume.save()
+            ranked_resumes = resumes.order_by('-score')
+            serializer = ResumeSerializer(ranked_resumes, many=True)
+            return Response(serializer.data)      
+        elif str(data.get('model') == '2'):
+            clear_pinecone()  #
+            try:
                 for resume in resumes:
-                    text =  extract_text(resume.file)
-                    # parsed_resume = Parse_resume(text)
-                    skill_comparison_result = compare_skill_embeddings(jd_skills,  resume.parsed_resume.get("skills", []), threshold=0.8)
+                    # print(">>2>>>", resume.parsed_resume, "<<<<<", flush=True)
+                    skill_comparison_result = compare_skill_embeddings(jd_skills, resume.parsed_resume.get("skills", []), threshold=0.8)
                     resume.MatchedSkills = skill_comparison_result["matched_skills"]
                     resume.MissingSkills = skill_comparison_result["missing_skills"]
                     resume.ExtractSkills = skill_comparison_result["extra_skills"]
                     resume.save()
-                    score = match_resume_to_jd(text,data.get('job_description'))
-                    print("score is ---",score," name : ",resume.file.path,flush=True)
-                    print("score ",score, "path ",resume.file.path, flush=True)
-                    resume.score = score
-                    resume.save()
-                ranked_resumes = resumes.order_by('-score')
-                serializer = ResumeSerializer(ranked_resumes, many=True)
-                return Response(serializer.data)
-            elif data.get('model') == '2':
-                clear_pinecone()
-                try:
-                    for resume in resumes:
-                        # text =  extract_text(resume.file.path)
-                        # parsed_resume = Parse_resume(text)
-                        skill_comparison_result = compare_skill_embeddings(jd_skills,  resume.parsed_resume.get("skills", []), threshold=0.8)
-                        resume.MatchedSkills = skill_comparison_result["matched_skills"]
-                        resume.MissingSkills = skill_comparison_result["missing_skills"]
-                        resume.ExtractSkills = skill_comparison_result["extra_skills"]
-                        resume.save()
-                        resume_id = str(resume.id)
-                        resume_embedding = get_cv_embedding(parsed_resume)
-                        if resume_embedding is not None:
-                            store_cv_embedding(resume_id, resume_embedding)
-                except Exception as e:
-                    print(f"Error processing resume: {e}",flush=True)
-                jd_embedding=get_jd_embedding(parsed_job_des) 
+
+                    resume_id = str(resume.id)
+                    resume_embedding = get_cv_embedding(resume.parsed_resume)
+                    if resume_embedding is not None:
+                        store_cv_embedding(resume_id, resume_embedding)
+                jd_embedding = get_jd_embedding(parsed_job_des)
                 job_id = "ML engineer"
                 store_jd_embedding(job_id, jd_embedding)
+                print("after store jd ****************",flush=True)
                 rank_candidates(jd_embedding, exclude_id=job_id, n=resumes.count())
+                print("after rank andiate****************",flush=True)
                 ranked_resumes = resumes.order_by('-score')
                 serializer = ResumeSerializer(ranked_resumes, many=True)
-                return Response(serializer.data)
-    else:
-        return JsonResponse({'error': 'send model'})
+                print(" until here 2 no problem seria  ",serializer.data,flush=True)
+                return JsonResponse(serializer.data, safe=False)
+            except Exception as e:
+                print(f"Error processing resume: {e}", flush=True)
+                return JsonResponse({'error111': 'Modetestspecified'}, status=400)
+        else:
+            print("data: ",data.get("model"),flush=True)
+            return JsonResponse({'error': 'Model type not 111specified'})
+    return JsonResponse({'error': 'Model type not specified'})
 
 
 

@@ -24,7 +24,6 @@ export default function SearchPage() {
     setIsLoading(true);
 
     try {
-      router.push("/home/chat");
       console.log("searchQuery : ", module);
       const response = await api.post("JDupload/", {
         job_description: searchQuery,
@@ -32,6 +31,8 @@ export default function SearchPage() {
       });
 
       if (response.status >= 200 && response.status < 300) {
+        router.push("/home/chat");
+
         toast.success("Job description uploaded successfully!");
       } else {
         toast.error(`Error: ${response.statusText}`);

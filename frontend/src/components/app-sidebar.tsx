@@ -1,7 +1,6 @@
 "use client";
 import { RiChatNewFill } from "react-icons/ri";
 import { IoLogOut } from "react-icons/io5";
-import Cookies from "js-cookie";
 import { useRecruiter } from "@/Context/RecruiterContext";
 import {
   Sidebar,
@@ -33,8 +32,8 @@ const items = [
 export function AppSidebar() {
   const { setModule } = useRecruiter();
   return (
-    <Sidebar className="bg-transparent">
-      <SidebarHeader className="bg-[#3F788A52]">
+    <Sidebar>
+      <SidebarHeader className="bg-[#3f788a]">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -52,17 +51,29 @@ export function AppSidebar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
                 <DropdownMenuItem>
-                  <span onClick={() => {setModule("1")}}>Beta 1</span>
+                  <span
+                    onClick={() => {
+                      setModule("1");
+                    }}
+                  >
+                    Beta 1
+                  </span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <span onClick={() => {setModule("2")}}>Beta 2</span>
+                  <span
+                    onClick={() => {
+                      setModule("2");
+                    }}
+                  >
+                    Beta 2
+                  </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-[#3f788a]">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="gap-5">
@@ -84,13 +95,13 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="bg-[#3f788a]">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <div className="ml-2 text-lg font-semibold w-full items-start justify-center mb-3 flex flex-row gap-4">
-                  <IoLogOut className="size-[25px]" />
-                  <Logout />
+                <IoLogOut className="size-[25px]" />
+                <Logout />
               </div>
             </DropdownMenu>
           </SidebarMenuItem>

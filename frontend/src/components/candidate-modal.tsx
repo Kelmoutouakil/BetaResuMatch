@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Rating } from "@/components/Rating-Chart";
 import { useState } from "react";
 import FeedBackDialog from "@/components/FeeadBackDialog";
+
 interface Candidate {
   name: string;
   title: string;
@@ -15,13 +16,11 @@ interface Candidate {
   summary: string;
 }
 
-
 interface CandidateCardProps {
   candidate: Candidate;
 }
 
 export default function CandidateModal({ candidate }: CandidateCardProps) {
-  // Destructure the candidate data
   const {
     name,
     title,
@@ -32,16 +31,21 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
     file,
     summary,
   } = candidate;
-  const [open, setOpen] = useState(false);
-  function handleClick() {
-    // Open the feedback modal
-    setOpen(true);
-  }
+  const backendUrl = "http://localhost:9000";
+  const ExtraformattedString = ExtractSkills.replace(/'/g, '"');
+  const MissingformattedString = MissingSkills.replace(/'/g, '"');
+  const MatchedformattedString = MatchedSkills.replace(/'/g, '"');
 
-    console.log("candidate : ", ExtractSkills.split(","))
+  // Parse into an array
+  const ExtraskillsArray = JSON.parse(ExtraformattedString);
+  const MissingskillsArray = JSON.parse(MissingformattedString);
+  const MatchedskillsArray = JSON.parse(MatchedformattedString);
+
+  const [openFeedback, setOpenFeedback] = useState(false);
+
   return (
     <div className="size-full overflow-y-scroll">
-      <div className=" text-black rounded-md max-h-screen flex flex-col relative">
+      <div className="text-black rounded-md max-h-screen flex flex-col relative">
         <div className="p-8 flex flex-col h-full">
           <div className="mb-8">
             <h2 className="text-2xl font-bold">{name}</h2>
@@ -50,16 +54,16 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
 
           <div className="mb-8">
             <h3 className="text-xl font-semibold mb-2">Summary</h3>
-            <p className="text-gray-500">{summary}</p>
+            <div className="w-full max-h-[300px] overflow-y-scroll">
+              <p className="text-gray-500">{summary}</p>
+            </div>
           </div>
 
           <div className="mb-8">
             <h3 className="text-xl font-semibold mb-2">Matched Skills:</h3>
             <ul className="space-y-2">
-              {MatchedSkills &&
-              Array.isArray(MatchedSkills) &&
-              MatchedSkills.length > 0 ? (
-                MatchedSkills.map((skill, index) => (
+              {MatchedskillsArray.length > 0 ? (
+                MatchedskillsArray.map((skill: string, index: number) => (
                   <li key={index} className="flex items-center">
                     <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
                     <span>{skill}</span>
@@ -75,18 +79,17 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
             <h3 className="text-xl font-semibold mb-2">
               Missing Required Skills:
             </h3>
+
             <ul className="space-y-2">
-              {MissingSkills &&
-              Array.isArray(MissingSkills) &&
-              MissingSkills.length > 0 ? (
-                MissingSkills.map((skill, index) => (
+              {MissingskillsArray.length > 0 ? (
+                MissingskillsArray.map((skill: string, index: number) => (
                   <li key={index} className="flex items-center">
-                    <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                    <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
                     <span>{skill}</span>
                   </li>
                 ))
               ) : (
-                <li>No missing skills available</li>
+                <li>No matched skills available</li>
               )}
             </ul>
           </div>
@@ -94,46 +97,49 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
           <div className="mb-8">
             <h3 className="text-xl font-semibold mb-2">Extra Skills:</h3>
             <ul className="space-y-2">
-              {ExtractSkills &&
-              Array.isArray(ExtractSkills) &&
-              ExtractSkills.length > 0 ? (
-                ExtractSkills.map((skill, index) => (
+              {ExtraskillsArray.length > 0 ? (
+                ExtraskillsArray.map((skill: string, index: number) => (
                   <li key={index} className="flex items-center">
-                    <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
-                    <span>{skill[0]}</span>
+                    <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                    <span>{skill}</span>
                   </li>
                 ))
               ) : (
-                <li>No extra skills available</li>
+                <li>No matched skills available</li>
               )}
             </ul>
           </div>
 
           <div className="flex flex-col gap-4 justify-center mb-8">
             <Rating score={score} />
+
+            {/* View Resume Button */}
             <Button
               variant="outline"
               className="flex-1 bg-gray-200 text-gray-800 hover:bg-[#3F788A99]"
+              onClick={() => window.open(backendUrl + file)}
             >
               View Resume
             </Button>
+
+            {/* Give Feedback Button */}
             <Button
               variant="outline"
               className="flex-1 bg-gray-200 text-gray-800 hover:bg-[#3F788A99]"
-              onClick={handleClick}
+              onClick={() => setOpenFeedback(true)}
             >
               Give Feedback
             </Button>
           </div>
-
-          <div className="mt-auto">
-            {/* <Button variant="outline" className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300">
-              Close
-            </Button> */}
-          </div>
         </div>
       </div>
-      <FeedBackDialog open={open} setOpen={setOpen} candidate={candidate} />
+
+      {/* Feedback Dialog */}
+      <FeedBackDialog
+        open={openFeedback}
+        setOpen={setOpenFeedback}
+        candidate={candidate}
+      />
     </div>
   );
 }

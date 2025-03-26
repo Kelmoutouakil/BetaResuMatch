@@ -63,7 +63,7 @@ export default function SearchBar({ setCandidates }: SearchBarProps) {
       const res = await api.post(apiEndpoint, requestData);
       setCandidates(res.data);
     } catch (error) {
-      toast.error("Error while making search request:", error);
+      toast.error("Error while making search request: " + error);
     } finally {
       setIsSearching(false);
     }

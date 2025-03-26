@@ -1,63 +1,67 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import api from "@/lib/axiosInstance"
-import { Loader } from "lucide-react"
-import { toast } from "sonner"
+import { useState, useEffect } from "react";
+import api from "@/lib/axiosInstance";
+import { Loader, X } from "lucide-react";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 interface Candidate {
-  name: string
-  jobtitle: string
-  Instutut_name: string
-  desired_role: string
-  file: string
-  summary: string
+  name: string;
+  jobtitle: string;
+  Instutut_name: string;
+  desired_role: string;
+  file: string; // URL of the PDF file
+  summary: string;
 }
 
 export default function CandidateList() {
-  const [candidates, setCandidates] = useState<Candidate[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCandidates = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        const response = await api.get("getcandidat/")
-        setCandidates(response.data)
+        const response = await api.get("getcandidat/");
+        setCandidates(response.data);
       } catch (err) {
-        toast.error(err.response?.data?.message || "Something went wrong!")
+        const axiosError = err as AxiosError<{ message: string }>;
+        toast.error(
+          axiosError?.response?.data?.message || "Something went wrong!"
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchCandidates()
-  }, [])
-
+    fetchCandidates();
+  }, []);
 
   return (
     <div className="flex h-fit">
       {/* Left panel - Candidate list */}
-      <div className="w-full ">
+      <div className="w-full">
         <div className="relative">
-          {/* Blue accent line */}
-          {/* <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#3F788A]"></div> */}
-
           {isLoading ? (
             <div className="flex justify-center items-center h-40">
               <Loader className="h-8 w-8 animate-spin text-[#89A8B2]" />
             </div>
           ) : candidates.length === 0 ? (
-            <div className="text-black p-6 text-center">No candidates found</div>
+            <div className="text-black p-6 text-center">
+              No candidates found
+            </div>
           ) : (
             <ul className="flex items-center justify-center flex-wrap lg:justify-start">
               {candidates.map((candidate, index) => (
                 <div
                   key={index}
-                  className={`py-5 px-8 border-b border-gray-500 cursor-pointer transition-colors`}
+                  className="py-5 px-8 border-b border-gray-500 cursor-pointer transition-colors"
+                  onClick={() => setSelectedFile(candidate.file)}
                 >
                   <div className="text-black text-lg font-medium">
-                    {candidate.name} 
+                    {candidate.name}
                   </div>
                 </div>
               ))}
@@ -65,7 +69,24 @@ export default function CandidateList() {
           )}
         </div>
       </div>
-    </div>
-  )
-}
 
+      {selectedFile && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full relative">
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+              onClick={() => setSelectedFile(null)}
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <h2 className="text-xl font-semibold mb-4">Candidate Resume</h2>
+            <iframe
+              src={"http://127.0.0.1:9000/" + selectedFile}
+              className="w-full h-[500px] border"
+            ></iframe>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

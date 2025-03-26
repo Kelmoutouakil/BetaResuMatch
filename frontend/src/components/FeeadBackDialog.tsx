@@ -11,18 +11,17 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader } from "lucide-react";
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "sonner";
 import api from "@/lib/axiosInstance";
 
 interface Candidate {
-    name: string;
-    file: string;
-  }
+  name: string;
+  file: string;
+}
 interface StatisticsDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-    candidate: Candidate;
+  candidate: Candidate;
 }
 
 export default function FeedBackDialog({
@@ -44,18 +43,26 @@ export default function FeedBackDialog({
 
     try {
       if (score.trim()) {
-        await api.post("/update/", { name: candidate.name, file: candidate.file, score: score });
+        await api.post("/update/", {
+          name: candidate.name,
+          file: candidate.file,
+          score: score,
+        });
         toast.success("Score updated successfully!");
       }
 
       if (feedback.trim()) {
-        console.log("feedback : ", feedback)
-        await api.post("/feedback/",{ name: candidate.name, file: candidate.file, feedback: feedback} );
+        console.log("feedback : ", feedback);
+        await api.post("/feedback/", {
+          name: candidate.name,
+          file: candidate.file,
+          feedback: feedback,
+        });
         toast.success("Feedback submitted successfully!");
       }
 
       setOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       toast.error("Failed to submit. Please try again.");
     } finally {
       setIsLoading(false);

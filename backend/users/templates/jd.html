@@ -6,20 +6,16 @@
     <title>Document</title>
 </head>
 <body>
-    <input type="text" id="jd">
-    <button id="submit">submit</button>
+  
 </body>
 <script>
-    
-    access = localStorage.getItem("access")
-    document.getElementById("submit").addEventListener("click",()=>{
-        fetch("http://127.0.0.1:9000/api/JDupload/",{
-        method: 'POST',
+        access = localStorage.getItem("accessToken")
+  
+        fetch("http://127.0.0.1:9000/api/dashbord/",{
+        method: 'GET',
         headers: {
-            'content-type':'application/json',
              Authorization: `Bearer ${access}`
         },
-        body: JSON.stringify({"job_description" : document.getElementById("jd").value, 'model':'1'})
     })
     .then((response)=>response.json())
     .then((data)=>{ console.log(data);
@@ -27,7 +23,6 @@
     })
     .catch((error)=>{
         console.log(error)
-    })
     })
 </script>
 </html>

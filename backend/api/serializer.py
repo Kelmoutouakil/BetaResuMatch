@@ -17,5 +17,6 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
             'Instutut_name',
             'desired_role',
             'file',
-            'summary'
+            'summary',
+            'feedback'
         ]

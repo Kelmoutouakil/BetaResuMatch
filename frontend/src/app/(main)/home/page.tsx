@@ -4,19 +4,14 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { Search, ArrowRight, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRecruiter } from "@/Context/RecruiterContext";
 import api from "@/lib/axiosInstance";
 import { toast } from "sonner";
 
 export default function SearchPage() {
-  const { job_description, setJobDescription, module } = useRecruiter();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    setSearchQuery(job_description);
-  }, [job_description]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,17 +23,15 @@ export default function SearchPage() {
 
     setIsLoading(true);
 
-    setJobDescription(searchQuery);
-
-    router.push("/home/chat");
+    
     try {
-      console.log("JDupload/", job_description, module);
-
+      
       const response = await api.post("JDupload/", {
-        job_description: job_description,
+        job_description: searchQuery,
         model: module,
       });
-
+      
+      router.push("/home/chat");
       if (response.status >= 200 && response.status < 300) {
         toast.success("Job description uploaded successfully!");
       } else {

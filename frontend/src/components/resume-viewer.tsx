@@ -306,8 +306,14 @@ export default function ResumeViewer() {
             Close
           </Button>
           {resumes.length > 0 && (
-            <Button onClick={handleClick}>Save Selection</Button>
-          )}
+              <Button onClick={handleClick}>
+                {isLoading ? (
+                  <Loader className="w-5 h-5 text-white animate-spin" />
+                ) : (
+                  "Save Selection"
+                )}
+              </Button>
+            )}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

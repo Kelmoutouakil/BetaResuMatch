@@ -57,10 +57,10 @@ export function AppSidebar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
                 <DropdownMenuItem>
-                  <span onClick={() => {setModule(1)}}>Module 1</span>
+                  <span onClick={() => {setModule("1")}}>Beta 1</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <span onClick={() => {setModule(2)}}>Module 2</span>
+                  <span onClick={() => {setModule("2")}}>Beta2 2</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

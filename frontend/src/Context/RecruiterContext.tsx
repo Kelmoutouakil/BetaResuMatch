@@ -7,13 +7,11 @@ type RecruiterContextType = {
   lastName: string;
   isSigned: boolean;
   accessToken: string | null;
-  job_description: string;
   module: string;
   setFirstName: (name: string) => void;
   setLastName: (name: string) => void;
   setIsSigned: (signed: boolean) => void;
   setAccessToken: (token: string | null) => void;
-  setJobDescription: (job_description: string) => void;
   setModule: (module: string) => void;
 };
 
@@ -24,7 +22,6 @@ export const RecruiterProvider = ({ children }: { children: ReactNode }) => {
   const [lastName, setLastName] = useState<string>("");
   const [isSigned, setIsSigned] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [job_description, setJobDescription] = useState<string>("");
   const [module, setModule] = useState<string>("1");
 
   useEffect(() => {
@@ -47,8 +44,8 @@ export const RecruiterProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <RecruiterContext.Provider value={{ 
-      firstName, lastName, isSigned, accessToken, job_description, module, 
-      setFirstName, setLastName, setIsSigned, setAccessToken , setJobDescription, setModule
+      firstName, lastName, isSigned, accessToken, module, 
+      setFirstName, setLastName, setIsSigned, setAccessToken , setModule
     }}>
       {children}
     </RecruiterContext.Provider>

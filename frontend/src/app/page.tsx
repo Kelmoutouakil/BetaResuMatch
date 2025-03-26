@@ -22,25 +22,25 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen  flex flex-col">
       <nav className="w-full py-6 px-8 md:px-16 flex justify-between items-center">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center">
+        <div className="flex items-center md:space-x-3 space-x-1">
+          <div className="md:w-10 w-8 md:h-10 h-8 bg-black rounded-full flex items-center justify-center">
             <span className="text-[#E2E2E2] text-xl">β</span>
           </div>
-          <span className="text-black font-bold text-xl">Ask Beta AI</span>
+          <span className="text-black font-bold md:text-xl text-sm">Ask Beta AI</span>
         </div>
 
         <div className="flex space-x-4">
           <Link
             onClick={RequestCrf}
             href="auth/login"
-            className="w-[138px] h-[56px] text-[15px] font-bold rounded-full bg-[#2F2E2E] text-[#E2E2E2] hover:bg-gray-700 transition-colors flex items-center justify-center"
+            className="md:w-[138px] w-[90px] md:h-[56px] h-[30px] text-[15px] font-bold rounded-full bg-[#2F2E2E] text-[#E2E2E2] hover:bg-gray-700 transition-colors flex items-center justify-center"
           >
             Login
           </Link>
           <Link
           onClick={RequestCrf}
             href="auth/Sign-up"
-            className="w-[138px] h-[56px] text-[15px] font-bold rounded-full bg-gray-100 text-[#2F2E2E] hover:bg-[#E2E2E2] transition-colors flex items-center justify-center"
+            className="md:w-[138px] w-[90px] md:h-[56px] h-[30px] text-[15px] font-bold rounded-full bg-gray-100 text-[#2F2E2E] hover:bg-[#E2E2E2] transition-colors flex items-center justify-center"
           >
             Sign up
           </Link>

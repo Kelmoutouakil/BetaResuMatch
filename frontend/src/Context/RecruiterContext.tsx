@@ -8,11 +8,13 @@ type RecruiterContextType = {
   isSigned: boolean;
   accessToken: string | null;
   job_description: string;
+  module: number;
   setFirstName: (name: string) => void;
   setLastName: (name: string) => void;
   setIsSigned: (signed: boolean) => void;
   setAccessToken: (token: string | null) => void;
   setJobDescription: (job_description: string) => void;
+  setModule: (module: number) => void;
 };
 
 const RecruiterContext = createContext<RecruiterContextType | undefined>(undefined);
@@ -23,6 +25,7 @@ export const RecruiterProvider = ({ children }: { children: ReactNode }) => {
   const [isSigned, setIsSigned] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [job_description, setJobDescription] = useState<string>("");
+  const [module, setModule] = useState<number>(0);
 
   useEffect(() => {
     const storedFirstName = localStorage.getItem("first_name");
@@ -44,8 +47,8 @@ export const RecruiterProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <RecruiterContext.Provider value={{ 
-      firstName, lastName, isSigned, accessToken, job_description,
-      setFirstName, setLastName, setIsSigned, setAccessToken , setJobDescription
+      firstName, lastName, isSigned, accessToken, job_description, module, 
+      setFirstName, setLastName, setIsSigned, setAccessToken , setJobDescription, setModule
     }}>
       {children}
     </RecruiterContext.Provider>

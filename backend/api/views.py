@@ -2,7 +2,8 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .serializer import ResumeSerializer, ResumeDetailSerializer
-from django.db.models import Count, Case, When, F, Value
+from django.db import models
+from django.db.models import Count, Case, When, F
 from .utils import (
     extract_text, 
     Parse_resume, store_cv_embedding, get_cv_embedding, summarize_text, compare_skill_embeddings,

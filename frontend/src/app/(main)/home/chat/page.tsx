@@ -6,6 +6,7 @@ import api from "@/lib/axiosInstance";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { useRecruiter } from "@/Context/RecruiterContext";
+import { Button } from "@/components/ui/button";
 
 interface Candidate {
   name: string;
@@ -22,6 +23,7 @@ export default function Home() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const { job_description } = useRecruiter();
   const [isLoading, setIsLoading] = useState(false);
+  const { module } = useRecruiter();
   useEffect(() => {
     console.log("Job Description:", job_description);
     if (job_description) {
@@ -30,7 +32,7 @@ export default function Home() {
         try {
           const response = await api.post("JDupload/", {
             job_description: job_description,
-            model: "2",
+            model: module,
           });
           console.log("response : ", response.data);
           setCandidates(response.data);
@@ -44,6 +46,16 @@ export default function Home() {
     }
   }, [job_description]);
 
+  const handleClick = async () => {
+    try {
+      const response = await api.get("dashbord/");
+      console.log("response : ", response.data);
+      toast.success("Statistics generated successfully");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Something went wrong!");
+    }
+  };
+
   return (
     <main className="min-h-screen p-6 w-full">
       <div className="size-full">
@@ -51,8 +63,16 @@ export default function Home() {
           <SearchBar setCandidates={setCandidates} />
         </div>
 
-        <h1 className="text-2xl font-bold text-slate-800 mb-6">Results</h1>
-
+        <div className="w-full h-fit flex justify-between ">
+          <h1 className="text-2xl font-bold text-slate-800 mb-6">Results</h1>
+          <Button
+            variant="outline"
+            className="bg-gray-200 text-gray-800 hover:bg-[#3F788A99]"
+            onClick={handleClick}
+          >
+            View statistics
+          </Button>
+        </div>
         {isLoading ? (
           <div className="flex justify-center items-center h-40">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#89A8B2]"></div>

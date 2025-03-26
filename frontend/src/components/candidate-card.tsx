@@ -3,7 +3,7 @@ interface Candidate {
   name: string;
   title: string;
   score: string;
-  extractSkills: string;
+  ExtractSkills: string;
   MatchedSkills: string;
   MissingSkills: string;
   file: string;

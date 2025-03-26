@@ -39,10 +39,7 @@ export default function Home() {
       const sendQuery = async () => {
         setIsLoading(true)
         try {
-          const response = await api.post("JDupload/", {
-            job_description: job_description,
-            model: module,
-          })
+          const response = await api.get("/Rank")
           console.log("response : ", response.data)
           setCandidates(response.data);
         } catch (err: any) {

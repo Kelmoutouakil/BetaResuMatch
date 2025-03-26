@@ -44,13 +44,13 @@ export default function FeedBackDialog({
 
     try {
       if (score.trim()) {
-        await api.post("/update", { name: candidate.name, file: candidate.file, score: score });
+        await api.post("/update/", { name: candidate.name, file: candidate.file, score: score });
         toast.success("Score updated successfully!");
       }
 
       if (feedback.trim()) {
         console.log("feedback : ", feedback)
-        await api.post("/feedback",{ name: candidate.name, file: candidate.file, feedback: feedback} );
+        await api.post("/feedback/",{ name: candidate.name, file: candidate.file, feedback: feedback} );
         toast.success("Feedback submitted successfully!");
       }
 

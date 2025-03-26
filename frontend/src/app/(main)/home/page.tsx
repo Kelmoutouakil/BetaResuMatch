@@ -1,53 +1,58 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Search, ArrowRight, Loader } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useRecruiter } from "@/Context/RecruiterContext"
-import api from "@/lib/axiosInstance"
-import { toast } from "sonner"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { Search, ArrowRight, Loader } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRecruiter } from "@/Context/RecruiterContext";
+import api from "@/lib/axiosInstance";
+import { toast } from "sonner";
 
 export default function SearchPage() {
-  const { job_description, setJobDescription, module } = useRecruiter()
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const { job_description, setJobDescription, module } = useRecruiter();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-      setSearchQuery(job_description)
-  }, [job_description])
+    setSearchQuery(job_description);
+  }, [job_description]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!searchQuery.trim()) {
-      toast.error("Please enter a job description")
-      return
+      toast.error("Please enter a job description");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     setJobDescription(searchQuery);
-    
-    router.push("/home/chat")
-    // try {
-    //   console.log("JDupload/", job_description, module)
-    //   await api.post("JDupload/", {
-    //     job_description: job_description,
-    //     model: module,
-    //   })
 
-    // } catch (error) {
-    //   toast.error("Failed to process your request. Please try again.")
-    // } finally {
-    //   setIsLoading(false)
-    // }
-  }
+    router.push("/home/chat");
+    try {
+      console.log("JDupload/", job_description, module);
+
+      const response = await api.post("JDupload/", {
+        job_description: job_description,
+        model: module,
+      });
+
+      if (response.status >= 200 && response.status < 300) {
+        toast.success("Job description uploaded successfully!");
+      } else {
+        toast.error(`Error: ${response.statusText}`);
+      }
+    } catch (error) {
+      toast.error("Failed to process your request. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col w-full">
-
       <main className="flex-1 flex flex-col items-center justify-center px-6">
         <div className="w-32 h-32 md:w-40 md:h-40 mb-12 flex items-center justify-center">
           <div className="w-full h-full bg-black rounded-full flex items-center justify-center">
@@ -61,7 +66,9 @@ export default function SearchPage() {
 
         <div className="flex items-center space-x-3 mb-16">
           <Search className="w-6 h-6 text-black" />
-          <span className="text-lg md:text-xl font-semibold uppercase text-black">What are you looking for?</span>
+          <span className="text-lg md:text-xl font-semibold uppercase text-black">
+            What are you looking for?
+          </span>
         </div>
 
         <form onSubmit={handleSubmit} className="w-full max-w-3xl">
@@ -90,6 +97,5 @@ export default function SearchPage() {
         </form>
       </main>
     </div>
-  )
+  );
 }
-

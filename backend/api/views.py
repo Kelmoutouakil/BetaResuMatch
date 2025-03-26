@@ -9,29 +9,27 @@ from .utils import (
     Parse_resume, store_cv_embedding, get_cv_embedding, summarize_text, compare_skill_embeddings,
     rank_candidates, parse_job_description, get_jd_embedding, store_jd_embedding, clear_pinecone
 )
-from .utils2 import match_resume_to_jd
+from .utils2 import match_resume_to_jd, extract_skill_names
 from users.models import Resume
 from rest_framework.permissions import IsAuthenticated
-import uuid,os,json
+import os,json
 from django.core.files.storage import default_storage
 from django.db import models
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def Upload(request):
-    print(" request here ",request.FILES.getlist('files'),flush=True)
     if request.FILES.get('files'):
         uploaded_files = request.FILES.getlist('files')
         for file in uploaded_files:
-            print("-----------",file.name,flush=True)
             filename, ext = os.path.splitext(file.name)
             if ext.lower() != '.pdf':
-                return JsonResponse({'error': f'Invalid file type: {ext}'}, status=400)
+                return JsonResponse({'error': f'Invalid file type: {ext}'})
             text = extract_text(file)
             parsed_resume = Parse_resume(text)
             extracted_name = parsed_resume.get('name')
             if not extracted_name:
-                return JsonResponse({'error': 'Could not extract name from resume'}, status=400)
+                return JsonResponse({'error': 'Could not extract name from resume'})
             existing_resume = Resume.objects.filter(user=request.user, name=extracted_name).first()
             if existing_resume:
                 if existing_resume.file and default_storage.exists(existing_resume.file.path):
@@ -58,8 +56,6 @@ def Upload(request):
                     ExtractSkills=parsed_resume.get('skills')
                 )
                 resume.save()
-        # serializer = ResumeDetailSerializer(Resume.objects.filter(user_id=request.user.id), many=True)
-        # return Response(serializer.data)
         return JsonResponse({'success': ' file uploaded'}, status=200)
     return JsonResponse({'error': 'No file uploaded'}, status=400)
     
@@ -68,7 +64,6 @@ def Upload(request):
 @permission_classes([IsAuthenticated])
 def JDupload(request):
     data = json.loads(request.body)
-    print("Incoming data:", data, flush=True)
     user = request.user
     if not data.get('job_description'):
         return JsonResponse({'error': 'Job description not uploaded'}, status=400)
@@ -83,31 +78,26 @@ def JDupload(request):
         if str(data.get('model')) == '1':
             for resume in resumes:
                 text = extract_text(resume.file)
-                print(">>1>>>", resume.parsed_resume, "<<<<<", flush=True)
-
                 skill_comparison_result = compare_skill_embeddings(jd_skills, resume.parsed_resume.get("skills", []), threshold=0.8)
-                resume.MatchedSkills = skill_comparison_result["matched_skills"]
-                resume.MissingSkills = skill_comparison_result["missing_skills"]
-                resume.ExtractSkills = skill_comparison_result["extra_skills"]
+                extracted_skills = extract_skill_names(skill_comparison_result)
+                resume.MatchedSkills = extracted_skills["matched_skills"]
+                resume.MissingSkills = extracted_skills["missing_skills"]
+                resume.ExtractSkills = extracted_skills["extra_skills"]
                 resume.save()
-                
                 score = match_resume_to_jd(text, data.get('job_description'))
                 resume.score = score
                 resume.save()
-            ranked_resumes = resumes.order_by('-score')
-            serializer = ResumeSerializer(ranked_resumes, many=True)
-            return Response(serializer.data)      
+            return JsonResponse({"sucess":"Data extracted and parsed succefuly"},status=200)  
         elif str(data.get('model') == '2'):
-            clear_pinecone()  #
+            clear_pinecone()  
             try:
                 for resume in resumes:
-                    # print(">>2>>>", resume.parsed_resume, "<<<<<", flush=True)
                     skill_comparison_result = compare_skill_embeddings(jd_skills, resume.parsed_resume.get("skills", []), threshold=0.8)
-                    resume.MatchedSkills = skill_comparison_result["matched_skills"]
-                    resume.MissingSkills = skill_comparison_result["missing_skills"]
-                    resume.ExtractSkills = skill_comparison_result["extra_skills"]
+                    extracted_skills = extract_skill_names(skill_comparison_result)
+                    resume.MatchedSkills = extracted_skills["matched_skills"]
+                    resume.MissingSkills = extracted_skills["missing_skills"]
+                    resume.ExtractSkills = extracted_skills["extra_skills"]
                     resume.save()
-
                     resume_id = str(resume.id)
                     resume_embedding = get_cv_embedding(resume.parsed_resume)
                     if resume_embedding is not None:
@@ -115,19 +105,12 @@ def JDupload(request):
                 jd_embedding = get_jd_embedding(parsed_job_des)
                 job_id = "ML engineer"
                 store_jd_embedding(job_id, jd_embedding)
-                print("after store jd ****************",flush=True)
                 rank_candidates(jd_embedding, exclude_id=job_id, n=resumes.count())
-                print("after rank andiate****************",flush=True)
-                ranked_resumes = resumes.order_by('-score')
-                serializer = ResumeSerializer(ranked_resumes, many=True)
-                print(" until here 2 no problem seria  ",serializer.data,flush=True)
-                return JsonResponse(serializer.data, safe=False)
+                return JsonResponse({"sucess":"Data extracted and parsed succefuly"},status=200)
             except Exception as e:
-                print(f"Error processing resume: {e}", flush=True)
-                return JsonResponse({'error111': 'Modetestspecified'}, status=400)
+                return JsonResponse({'error': 'Gemini Failed to extract data'})
         else:
-            print("data: ",data.get("model"),flush=True)
-            return JsonResponse({'error': 'Model type not 111specified'})
+            return JsonResponse({'error': 'Model type not supported'})
     return JsonResponse({'error': 'Model type not specified'})
 
 
@@ -217,3 +200,11 @@ def geDashbord(request):
         'school_data': school_data,
         'job_data': job_data
     })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getRankedCandidat(request):
+    resumes = Resume.objects.filter(user_id=request.user.id)
+    ranked_resumes = resumes.order_by('-score')
+    serializer = ResumeSerializer(ranked_resumes, many=True)
+    return Response(serializer.data)

@@ -13,6 +13,7 @@ from users.models import Resume
 from rest_framework.permissions import IsAuthenticated
 import uuid,os,json
 from django.core.files.storage import default_storage
+from django.db import models
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

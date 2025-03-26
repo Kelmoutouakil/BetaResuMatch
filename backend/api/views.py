@@ -92,7 +92,6 @@ def JDupload(request):
                 resume.save()
                 
                 score = match_resume_to_jd(text, data.get('job_description'))
-                print("score is ---", score, " name : ", resume.file.path, flush=True)
                 resume.score = score
                 resume.save()
             ranked_resumes = resumes.order_by('-score')

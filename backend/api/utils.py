@@ -3,6 +3,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from huggingface_hub import InferenceClient
 import google.generativeai as genai
 import json
+from django.http import JsonResponse
 import numpy as np
 import os, re, time
 from .pinecone_integr import embedding_model, index
@@ -13,16 +14,8 @@ repo_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 client = InferenceClient(model=repo_id, token=os.getenv('HUGGINGFACE_API_KEY'))
 def extract_text(uploaded_file):
     print("------------extract-----",flush=True)
-#     if file_path.endswith('.pdf'):
-#         reader = PdfReader(file_path)
-#         text = ''
-#         for page in reader.pages:
-#             text += page.extract_text()
-#         return text
-#     else:
-#         raise ValueError("Unsupport file format")
-    if not uploaded_file.name.endswith('.pdf'):
-        raise ValueError("Unsupported file format")
+    if  not uploaded_file or not uploaded_file.name.endswith('.pdf'):
+        return JsonResponse({'error':"file not found or format not supported"})
 
     reader = PdfReader(uploaded_file)
     text = ''
@@ -30,7 +23,6 @@ def extract_text(uploaded_file):
         extracted_text = page.extract_text()
         if extracted_text:
             text += extracted_text + "\n"
-    print("-------text---",text,flush=True)
     return text
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))

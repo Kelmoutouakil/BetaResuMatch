@@ -18,3 +18,13 @@ def match_resume_to_jd(resume_text, jd_text):
     v2 = model.infer_vector(preprocess_text(jd_text).split())
     similarity = 100*(np.dot(np.array(v1), np.array(v2))) / (norm(np.array(v1)) * norm(np.array(v2)))
     return round(similarity, 2)
+
+def extract_skill_names(skill_comparison_result):
+    def clean_skills(skill_list):
+        return [skill if isinstance(skill, str) else skill[0] for skill in skill_list]
+
+    return {
+        "matched_skills": clean_skills(skill_comparison_result.get("matched_skills", [])),
+        "missing_skills": clean_skills(skill_comparison_result.get("missing_skills", [])),
+        "extra_skills": clean_skills(skill_comparison_result.get("extra_skills", []))
+    }

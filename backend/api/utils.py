@@ -3,6 +3,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from huggingface_hub import InferenceClient
 import google.generativeai as genai
 import json
+from django.http import JsonResponse
 import numpy as np
 import os, re, time
 from .pinecone_integr import embedding_model, index
@@ -12,32 +13,20 @@ from users.models import Resume
 repo_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 client = InferenceClient(model=repo_id, token=os.getenv('HUGGINGFACE_API_KEY'))
 def extract_text(uploaded_file):
-    print("------------extract-----",flush=True)
-#     if file_path.endswith('.pdf'):
-#         reader = PdfReader(file_path)
-#         text = ''
-#         for page in reader.pages:
-#             text += page.extract_text()
-#         return text
-#     else:
-#         raise ValueError("Unsupport file format")
-    if not uploaded_file.name.endswith('.pdf'):
-        raise ValueError("Unsupported file format")
-
+    if  not uploaded_file or not uploaded_file.name.endswith('.pdf'):
+        return JsonResponse({'error':"file not found or format not supported"})
     reader = PdfReader(uploaded_file)
     text = ''
     for page in reader.pages:
         extracted_text = page.extract_text()
         if extracted_text:
             text += extracted_text + "\n"
-    print("-------text---",text,flush=True)
     return text
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 def Parse_resume(text):
-    print("*****************",flush=True)
     if not os.getenv("GEMINI_API_KEY"):
-        raise ValueError("Gemini API key is not set.")
+        return JsonResponse({'error': 'Gemini API key is not set.'})
     prompt = f"""
         Extract the following information from the CV below and return a valid JSON object:
     
@@ -79,11 +68,10 @@ def Parse_resume(text):
 
     try:
         parsed_info = json.loads(cleaned_text)
-        print("parsed info",parsed_info,flush=True)
     except json.JSONDecodeError:
-        print("---error: from pars resume ---",flush=True)
         print("API returned invalid JSON. Check response format.",flush=True)
         parsed_info = {"error": "Invalid API response", "raw_response": cleaned_text}
+        return JsonResponse({'error': 'API returned invalid JSON. Check response format.'})
     
     return parsed_info
 
@@ -91,7 +79,7 @@ def Parse_resume(text):
 
 def parse_job_description(jd_text, retries=3):
     if not os.getenv("GEMINI_API_KEY"):
-        raise ValueError("Gemini API key is not set.")
+        return JsonResponse({'error': 'Gemini API key is not set.'})
 
     prompt = f"""
     Extract the following structured information from the job description below and return a valid JSON object:
@@ -139,8 +127,8 @@ def parse_job_description(jd_text, retries=3):
             else:
                 print("Failed to parse job description after retries.")
                 return {"error": str(e), "raw_response": response.text if 'response' in locals() else None}
-
-    return {"error": "All retry attempts failed", "raw_response": None}
+    
+    return JsonResponse({"error": "All retry failed  , please  provide skills requeried in Your job description"})
 
 def get_jd_embedding(jd_data, retries=3):
     text_representation = f"""
@@ -160,7 +148,7 @@ def get_jd_embedding(jd_data, retries=3):
                 time.sleep(wait_time)
             else:
                 print("Failed to generate embedding after retries.")
-                return None
+                return JsonResponse({'error': 'Failed to generate embedding after retries.'})
             
 def store_jd_embedding(jd_id,jd_embedding):
 
@@ -238,6 +226,7 @@ def store_cv_embedding(cv_id, cv_embedding):
         print(f"Successfully stored CV embedding for ID: {cv_id}")
     except Exception as e:
         print(f"Failed to store CV embedding for ID {cv_id}: {e}")
+        return JsonResponse({"error":"Failed to generate embedding after retries."})
 
 
 def summarize_text(text):
@@ -280,34 +269,7 @@ def extract_skill_embeddings(skill_names, text_embeddings, skill_to_index):
     skill_indices = [skill_to_index[skill] for skill in skill_names]
     return text_embeddings[skill_indices]
 
-# def compare_skill_embeddings(job_skills, candidate_skills, threshold=0.8):
- 
-#     if job_skills and candidate_skills:
-#         job_skill_embeddings = embedding_model.encode(job_skills, convert_to_tensor=True)
 
-#         candidate_skill_embeddings = embedding_model.encode(candidate_skills, convert_to_tensor=True)
-
-#         similarity_matrix = cosine_similarity(job_skill_embeddings.cpu().numpy(), candidate_skill_embeddings.cpu().numpy())
-
-#         matched_skills = []
-#         missing_skills = []
-#         extra_skills = candidate_skills.copy()
-
-#         for i, job_skill in enumerate(job_skills):
-#             max_similarity = np.max(similarity_matrix[i])
-#             if max_similarity >= threshold:
-#                 matched_index = np.argmax(similarity_matrix[i])
-#                 matched_skill = candidate_skills[matched_index]
-#                 matched_skills.append((job_skill, matched_skill))
-#                 extra_skills.remove(matched_skill)
-#             else:
-#                 missing_skills.append(job_skill)
-
-#     return {
-#         "matched_skills": matched_skills,
-#         "missing_skills": missing_skills,
-#         "extra_skills": extra_skills
-#     }
 def compare_skill_embeddings(job_skills, candidate_skills, threshold=0.8):
     """
     Compare job skills and candidate skills using embeddings with robust error handling.
@@ -329,7 +291,6 @@ def compare_skill_embeddings(job_skills, candidate_skills, threshold=0.8):
         }
     
     try:
-        # Generate embeddings with input validation
         job_skills = [str(skill) for skill in job_skills if str(skill).strip()]
         candidate_skills = [str(skill) for skill in candidate_skills if str(skill).strip()]
         

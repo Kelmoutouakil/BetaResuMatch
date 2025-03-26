@@ -28,7 +28,6 @@ def Upload(request):
             text = extract_text(file)
             parsed_resume = Parse_resume(text)
             extracted_name = parsed_resume.get('name')
-
             if not extracted_name:
                 return JsonResponse({'error': 'Could not extract name from resume'}, status=400)
             existing_resume = Resume.objects.filter(user=request.user, name=extracted_name).first()

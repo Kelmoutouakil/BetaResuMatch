@@ -17,7 +17,6 @@ interface Candidate {
 export default function CandidateList() {
   const [candidates, setCandidates] = useState<Candidate[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null)
 
   useEffect(() => {
     const fetchCandidates = async () => {
@@ -36,9 +35,6 @@ export default function CandidateList() {
     fetchCandidates()
   }, [])
 
-  const handleSelectCandidate = (candidate: Candidate) => {
-    setSelectedCandidate(candidate)
-  }
 
   return (
     <div className="flex h-fit">
@@ -53,19 +49,16 @@ export default function CandidateList() {
               <Loader className="h-8 w-8 animate-spin text-[#89A8B2]" />
             </div>
           ) : candidates.length === 0 ? (
-            <div className="text-white p-6 text-center">No candidates found</div>
+            <div className="text-black p-6 text-center">No candidates found</div>
           ) : (
             <ul className="flex items-center justify-center flex-wrap lg:justify-start">
               {candidates.map((candidate, index) => (
                 <li
                   key={index}
-                  onClick={() => handleSelectCandidate(candidate)}
-                  className={`py-6 px-4 border-b border-gray-700 cursor-pointer hover:bg-[#3F3F3F] transition-colors ${
-                    selectedCandidate === candidate ? "bg-[#3F3F3F]" : ""
-                  }`}
+                  className={`py-6 px-4 border-b border-gray-700 cursor-pointer transition-colors`}
                 >
                   <div className="text-white text-lg font-medium">
-                    {candidate.name} - {candidate.jobtitle}
+                    {candidate.name} 
                   </div>
                 </li>
               ))}

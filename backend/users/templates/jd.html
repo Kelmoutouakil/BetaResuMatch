@@ -6,11 +6,12 @@
     <title>Document</title>
 </head>
 <body>
-  
+  <h>hello</h>
 </body>
 <script>
         access = localStorage.getItem("accessToken")
-  
+    console.log(access)
+
         fetch("http://127.0.0.1:9000/api/dashbord/",{
         method: 'GET',
         headers: {

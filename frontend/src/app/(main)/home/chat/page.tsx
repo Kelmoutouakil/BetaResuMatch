@@ -46,18 +46,15 @@ export default function Home() {
     }
   }, [job_description]);
 
-    const handleClick = async () => {
+  const handleClick = async () => {
     try {
-      const response = await api.post("dashboard/", {
-        job_description: job_description,
-        model: module,
-      });
+      const response = await api.get("dashbord/");
       console.log("response : ", response.data);
       toast.success("Statistics generated successfully");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Something went wrong!");
     }
-
+  };
 
   return (
     <main className="min-h-screen p-6 w-full">
@@ -66,11 +63,11 @@ export default function Home() {
           <SearchBar setCandidates={setCandidates} />
         </div>
 
-        <div className="w-full h-fit">
+        <div className="w-full h-fit flex justify-between ">
           <h1 className="text-2xl font-bold text-slate-800 mb-6">Results</h1>
           <Button
             variant="outline"
-            className="flex-1 bg-gray-200 text-gray-800 hover:bg-[#3F788A99]"
+            className="bg-gray-200 text-gray-800 hover:bg-[#3F788A99]"
             onClick={handleClick}
           >
             View statistics

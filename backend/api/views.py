@@ -87,6 +87,7 @@ def JDupload(request):
                 score = match_resume_to_jd(text, data.get('job_description'))
                 resume.score = score
                 resume.save()
+
             return JsonResponse({"sucess":"Data extracted and parsed succefuly"},status=200)  
         elif str(data.get('model') == '2'):
             clear_pinecone()  
@@ -136,9 +137,10 @@ def getCandidat(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_resume_score(request):
-    name = request.data.get('name', None)
-    file = request.data.get('file', None)
-    score = request.data.get('score', None)
+    data = json.loads(request.body)
+    name = data.get('name')
+    file = data.get('file')
+    score = data.get('score')
 
     if not score or (not name and not file):
         return Response({"detail": "Please provide a score and either a name or file."}, status=404)
@@ -160,9 +162,11 @@ def update_resume_score(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_feedback(request):
-    name = request.data.get('name', None)
-    file = request.data.get('file', None)
-    feedback = request.data.get('feedback', None)
+    data = json.loads(request.body)
+    name = data.get('name')
+
+    file = data.get('file')
+    feedback = data.get('feedback')
 
     if not feedback or (not name and not file):
         return Response({"detail": "Please provide a feedback and either a name or file."}, status=404)

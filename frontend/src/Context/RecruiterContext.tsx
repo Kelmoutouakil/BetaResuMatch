@@ -25,7 +25,7 @@ export const RecruiterProvider = ({ children }: { children: ReactNode }) => {
   const [isSigned, setIsSigned] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [job_description, setJobDescription] = useState<string>("");
-  const [module, setModule] = useState<number>(0);
+  const [module, setModule] = useState<number>(1);
 
   useEffect(() => {
     const storedFirstName = localStorage.getItem("first_name");

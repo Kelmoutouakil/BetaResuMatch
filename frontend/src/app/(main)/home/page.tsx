@@ -14,11 +14,11 @@ export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    if (job_description) {
-      setSearchQuery(job_description)
-    }
-  }, [job_description])
+  // useEffect(() => {
+  //   if (job_description) {
+  //     setSearchQuery(job_description)
+  //   }
+  // }, [job_description ])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,8 +30,9 @@ export default function SearchPage() {
 
     setIsLoading(true)
 
+    setJobDescription(searchQuery);
+
     try {
-      setJobDescription(searchQuery)
 
       await api.post("JDupload/", {
         job_description: searchQuery,

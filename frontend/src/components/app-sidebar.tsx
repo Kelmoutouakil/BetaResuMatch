@@ -34,7 +34,7 @@ export function AppSidebar() {
   const handleClick = () => {
     setIsSigned(false);
     Cookies.remove("isSigned");
-    window.location.href = "/login";
+    window.location.href = "/auth/login";
   };
   const { setModule } = useRecruiter();
   return (

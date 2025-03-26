@@ -12,9 +12,9 @@ interface Candidate {
   name: string;
   title: string;
   score: string;
-  extractSkills: string[];
-  matchedSkills: string[];
-  missingSkills: string[];
+  extractSkills: string;
+  MatchedSkills: string;
+  MissingSkills: string;
   file: string;
   summary: string;
 }
@@ -26,6 +26,7 @@ export default function Home() {
   const { module } = useRecruiter();
   useEffect(() => {
     console.log("Job Description:", job_description);
+    console.log("Sending query: job Description->", job_description, "module->",  module);
     if (job_description) {
       const sendQuery = async () => {
         setIsLoading(true);
@@ -44,8 +45,11 @@ export default function Home() {
       };
       sendQuery();
     }
-  }, [job_description]);
+  }, [job_description, module]);
 
+  useEffect(() => {
+    console.log("Updated Candidates:", candidates);
+  }, [candidates]);
   const handleClick = async () => {
     try {
       const response = await api.get("dashbord/");
@@ -60,7 +64,7 @@ export default function Home() {
     <main className="min-h-screen p-6 w-full">
       <div className="size-full">
         <div className="mb-10">
-          <SearchBar setCandidates={setCandidates} />
+          {/* <SearchBar setCandidates={setCandidates} /> */}
         </div>
 
         <div className="w-full h-fit flex justify-between ">

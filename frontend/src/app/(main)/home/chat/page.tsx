@@ -33,9 +33,9 @@ export default function Home() {
   const [statisticsOpen, setStatisticsOpen] = useState(false)
   const [statisticsData, setStatisticsData] = useState<StatisticsData | null>(null)
   useEffect(() => {
-    if(!job_description)
-      router.push("/home");
-    if (job_description) {
+    // if(!job_description)
+    //   router.push("/home");
+
       const sendQuery = async () => {
         setIsLoading(true)
         try {
@@ -49,9 +49,9 @@ export default function Home() {
         }
       }
       sendQuery()
-    }
     
-  }, [job_description, module])
+    
+  }, [module])
 
   useEffect(() => {
     console.log("Updated Candidates:", candidates)

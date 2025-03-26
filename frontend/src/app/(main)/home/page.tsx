@@ -25,13 +25,13 @@ export default function SearchPage() {
 
     
     try {
+      router.push("/home/chat");
       
       const response = await api.post("JDupload/", {
         job_description: searchQuery,
         model: module,
       });
       
-      router.push("/home/chat");
       if (response.status >= 200 && response.status < 300) {
         toast.success("Job description uploaded successfully!");
       } else {

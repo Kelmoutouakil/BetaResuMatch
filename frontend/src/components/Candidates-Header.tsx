@@ -53,14 +53,14 @@ export default function CandidateList() {
           ) : (
             <ul className="flex items-center justify-center flex-wrap lg:justify-start">
               {candidates.map((candidate, index) => (
-                <li
+                <div
                   key={index}
-                  className={`py-6 px-4 border-b border-gray-700 cursor-pointer transition-colors`}
+                  className={`py-3 px-2 border-b border-gray-500 cursor-pointer transition-colors`}
                 >
-                  <div className="text-white text-lg font-medium">
+                  <div className="text-black text-lg font-medium">
                     {candidate.name} 
                   </div>
-                </li>
+                </div>
               ))}
             </ul>
           )}

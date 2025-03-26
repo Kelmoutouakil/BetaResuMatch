@@ -52,7 +52,7 @@ def Parse_resume(text):
             }}
         ],
         "skills": ["Skill1", "Skill2", "Skill3"],
-        "job_title": "Current or most recent job title",
+        "job_title": "Current or most recent job title , if still student return student",
         "latest_school": "Current or most recent school",
         "desired_role": "Desired role or internship title"
     }}

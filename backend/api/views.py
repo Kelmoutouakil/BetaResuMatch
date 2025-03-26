@@ -136,9 +136,11 @@ def getCandidat(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_resume_score(request):
-    name = request.data.get('name', None)
-    file = request.data.get('file', None)
-    score = request.data.get('score', None)
+    print("---->enter",flush=True)
+    data = json.loads(request.body)
+    name = data.get('name')
+    file = data.get('file')
+    score = data.get('score')
 
     if not score or (not name and not file):
         return Response({"detail": "Please provide a score and either a name or file."}, status=404)

@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ResumeViewer from "./resume-viewer";
 import CandidateList from "./Candidates-Header";
+import Logout from "./Logout";
 const items = [
   {
     title: "New Chat",
@@ -30,12 +31,6 @@ const items = [
   },
 ];
 export function AppSidebar() {
-  const { setIsSigned } = useRecruiter();
-  const handleClick = () => {
-    setIsSigned(false);
-    Cookies.remove("isSigned");
-    window.location.href = "/auth/login";
-  };
   const { setModule } = useRecruiter();
   return (
     <Sidebar className="bg-transparent">
@@ -93,14 +88,9 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
-              <div className="ml-2 text-lg font-semibold flex flex-col w-full items-start justify-center mb-3">
-                <a
-                  href={"/"}
-                  className="flex flex-row items-center justify-center"
-                >
-                  <IoLogOut className="size-[20px]" />
-                  <span className="ml-4 text-lg font-semibold" onClick={handleClick}>Logout</span>
-                </a>
+              <div className="ml-2 text-lg font-semibold w-full items-start justify-center mb-3 flex flex-row gap-4">
+                  <IoLogOut className="size-[25px]" />
+                  <Logout />
               </div>
             </DropdownMenu>
           </SidebarMenuItem>

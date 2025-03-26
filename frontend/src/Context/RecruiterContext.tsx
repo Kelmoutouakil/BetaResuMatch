@@ -36,11 +36,6 @@ export const RecruiterProvider = ({ children }: { children: ReactNode }) => {
     if (storedAccessToken) setAccessToken(storedAccessToken);
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("first_name", firstName);
-    localStorage.setItem("last_name", lastName);
-    Cookies.set("isSigned", String(isSigned), { expires: 1 });
-  }, [firstName, lastName, isSigned]);
 
   return (
     <RecruiterContext.Provider value={{ 

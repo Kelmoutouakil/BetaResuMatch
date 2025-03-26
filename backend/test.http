@@ -1,0 +1,24 @@
+
+# POST http://127.0.0.1:9000/user/create/
+# Content-Type: application/json
+
+# {
+#     "first_name": "test",
+#     "last_name" : "test",
+#     "email": "dfg@gmail.com",
+#     "password1": "123456",
+#     "password2": "123456"
+# }
+
+
+# POST http://127.0.0.1:9000/api/token/
+# Content-Type: application/json
+
+# {
+#     "email": "meryeme@gmail.com",
+#     "password": "123456"
+# }
+
+GET http://127.0.0.1:9000/api/Details/
+Content-Type: application/json
+Authorization

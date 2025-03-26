@@ -13,7 +13,7 @@ import { Loader } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-
+import api from "@/lib/axiosInstance";
 
 interface Candidate {
     name: string;
@@ -44,12 +44,13 @@ export default function FeedBackDialog({
 
     try {
       if (score.trim()) {
-        await axios.post("/api/update", { name: candidate.name, file: candidate.file, score: score });
+        await api.post("/update", { name: candidate.name, file: candidate.file, score: score });
         toast.success("Score updated successfully!");
       }
 
       if (feedback.trim()) {
-        await axios.post("/api/feedback",{ name: candidate.name, file: candidate.file, feedback: feedback} );
+        console.log("feedback : ", feedback)
+        await api.post("/feedback",{ name: candidate.name, file: candidate.file, feedback: feedback} );
         toast.success("Feedback submitted successfully!");
       }
 

@@ -14,7 +14,7 @@ interface Candidate {
   file: string;
   summary: string;
 }
-const backendUrl = "http://localhost:8000";
+const backendUrl = "https://localhost:8000";
 
 export default function CandidateList() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -81,11 +81,7 @@ export default function CandidateList() {
             </button>
             <h2 className="text-xl font-semibold mb-4">Candidate Resume</h2>
             <iframe
-<<<<<<< HEAD
               src={"https://127.0.0.1:8000/" + selectedFile}
-=======
-              src={backendUrl + selectedFile}
->>>>>>> 3c4c2ca8a061a103078240f3ab30c70433d96367
               className="w-full h-[500px] border"
             ></iframe>
           </div>

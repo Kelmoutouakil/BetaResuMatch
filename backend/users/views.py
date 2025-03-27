@@ -4,13 +4,12 @@ from django.middleware.csrf import get_token
 from rest_framework.permissions import IsAuthenticated
 from .forms import UserRegistationForm
 import json
-from rest_framework.decorators import api_view
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from .models import User
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.decorators import api_view, permission_classes
 
 @api_view(['POST'])
 def CreateUser(request):

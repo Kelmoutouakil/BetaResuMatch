@@ -36,6 +36,8 @@ def Upload(request):
                     default_storage.delete(existing_resume.file.path)
                 existing_resume.file = file
                 existing_resume.summary = summarize_text(text)
+                if not existing_resume.summary:
+                    return JsonResponse({"error": "Failed to generate summary, you consume your api credies in hugginface"})
                 existing_resume.parsed_resume = parsed_resume
                 existing_resume.jobtitle = parsed_resume.get('job_title')
                 existing_resume.Instutut_name = parsed_resume.get('latest_school')
@@ -44,11 +46,14 @@ def Upload(request):
                 existing_resume.save()
                 resume = existing_resume  
             else:
+                summarry=summarize_text(text),
+                if not summarry:
+                        return JsonResponse({"error": "Failed to generate summary, you consume your api credies in hugginface"})
                 resume = Resume(
                     user=request.user,
                     file=file,
                     name=extracted_name,
-                    summary=summarize_text(text),
+                    summary=summarry,
                     parsed_resume=parsed_resume,
                     jobtitle=parsed_resume.get('job_title'),
                     Instutut_name=parsed_resume.get('latest_school'),

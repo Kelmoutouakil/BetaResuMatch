@@ -81,7 +81,7 @@ export default function CandidateList() {
             </button>
             <h2 className="text-xl font-semibold mb-4">Candidate Resume</h2>
             <iframe
-              src={"https://127.0.0.1/" + selectedFile}
+              src={"https://127.0.0.1:8000/" + selectedFile}
               className="w-full h-[500px] border"
             ></iframe>
           </div>

@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from .models import User
 from django.contrib.auth import authenticate
-
+from rest_framework.permissions import IsAuthenticated
 
 
 @api_view(['POST'])
@@ -40,6 +40,15 @@ def pdfinput(request):
     return render(request,'jd.html')
 def Postregister(request):
     return render(request,'register.html')
+@api_view(['Get'])
+@permission_classes([IsAuthenticated])
+def getuser(request):
+    if request.user.is_authenticated:
+        first_name = request.user.first_name
+        last_name = request.user.last_name
+        return JsonResponse({"first_name": first_name, "last_name": last_name})
+    return JsonResponse({"error": "User not authenticated"}, status=401)
+
 
 @api_view(['GET'])
 def GetCrftoken(request):

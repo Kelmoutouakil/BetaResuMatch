@@ -21,5 +21,6 @@ fi
 python manage.py makemigrations
 
 python manage.py migrate 
+watchfiles "hypercorn project.asgi:application --bind 0.0.0.0:8000 --certfile /etc/certs/crt.crt --keyfile /etc/certs/key.key"
 
-hypercorn  project.asgi:application --bind 0.0.0.0:443 --certfile /etc/certs/crt.crt --keyfile /etc/certs/key.key
+# hypercorn  project.asgi:application --bind 0.0.0.0:8000  --certfile /etc/certs/crt.crt --keyfile /etc/certs/key.key

@@ -58,7 +58,7 @@ export default function SignupForm() {
       console.log("Sending user data:", userData);
 
       const response = await axios.post(
-        "https://localhost/user/create/",
+        "https://localhost:8000/user/create/",
         userData,
         {
           headers: {

@@ -7,7 +7,7 @@ import FeedBackDialog from "@/components/FeeadBackDialog";
 
 interface Candidate {
   name: string;
-  title: string;
+  jobtitle: string;
   score: string;
   ExtractSkills: string;
   MatchedSkills: string;
@@ -23,7 +23,7 @@ interface CandidateCardProps {
 export default function CandidateModal({ candidate }: CandidateCardProps) {
   const {
     name,
-    title,
+    jobtitle,
     score,
     ExtractSkills,
     MatchedSkills,
@@ -36,7 +36,7 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
   const MissingformattedString = MissingSkills.replace(/'/g, '"');
   const MatchedformattedString = MatchedSkills.replace(/'/g, '"');
 
-  // Parse into an array
+
   const ExtraskillsArray = JSON.parse(ExtraformattedString);
   const MissingskillsArray = JSON.parse(MissingformattedString);
   const MatchedskillsArray = JSON.parse(MatchedformattedString);
@@ -49,7 +49,7 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
         <div className="p-8 flex flex-col h-full">
           <div className="mb-8">
             <h2 className="text-2xl font-bold">{name}</h2>
-            <p className="text-gray-500">{title}</p>
+            <p className="text-gray-500">{jobtitle}</p>
           </div>
 
           <div className="mb-8">
@@ -113,7 +113,6 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
           <div className="flex flex-col gap-4 justify-center mb-8">
             <Rating score={score} />
 
-            {/* View Resume Button */}
             <Button
               variant="outline"
               className="flex-1 bg-gray-200 text-gray-800 hover:bg-[#3F788A99]"
@@ -122,7 +121,6 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
               View Resume
             </Button>
 
-            {/* Give Feedback Button */}
             <Button
               variant="outline"
               className="flex-1 bg-gray-200 text-gray-800 hover:bg-[#3F788A99]"
@@ -134,7 +132,6 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
         </div>
       </div>
 
-      {/* Feedback Dialog */}
       <FeedBackDialog
         open={openFeedback}
         setOpen={setOpenFeedback}

@@ -1,7 +1,7 @@
 "use client";
 interface Candidate {
   name: string;
-  title: string;
+  jobtitle: string;
   score: string;
   ExtractSkills: string;
   MatchedSkills: string;
@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/dialog";
 
 export default function CandidateCard({ candidate }: CandidateCardProps) {
-  // Destructure the candidate data
   const { name, title, score } = candidate;
   // const [isModalOpen, setIsModalOpen] = useState(false);
   return (
@@ -36,9 +35,9 @@ export default function CandidateCard({ candidate }: CandidateCardProps) {
             {score || 0}%
           </div>
           <h2 className="text-lg lg:text-xl font-semibold mb-1">
-            {name || "unkown name"}
+            {name || "Can't extract name"}
           </h2>
-          <p className="text-black/80">{title || "unkown title"}</p>
+          <p className="text-black/80">{title || "can't extract job title"}</p>
         </div>
       </DialogTrigger>
       <DialogContent className="w-full max-w-full lg:max-w-[500px] rounded-none lg:rounded-[11px] lg:w-[500px] h-full lg:h-fit  lg:max-h-[70vh] overflow-hidden overflow-y-scroll">

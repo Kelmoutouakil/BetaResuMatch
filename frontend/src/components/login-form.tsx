@@ -36,12 +36,10 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      // Validate the form data using the schema
       loginSchema.parse(formData);
 
       const crftoken = localStorage.getItem("crf");
 
-      // Use the state data instead of FormData
       const userData = {
         email: formData.email,
         password: formData.password,

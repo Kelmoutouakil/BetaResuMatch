@@ -14,7 +14,7 @@ type RecruiterContextType = {
   setAccessToken: (token: string | null) => void;
   setModule: (module: string) => void;
 };
-
+const backendUrl = "http://localhost:8000";
 const RecruiterContext = createContext<RecruiterContextType | undefined>(undefined);
 
 export const RecruiterProvider = ({ children }: { children: ReactNode }) => {

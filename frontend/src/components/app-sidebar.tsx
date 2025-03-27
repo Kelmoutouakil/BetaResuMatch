@@ -73,7 +73,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent className="bg-[#3f788a]">
+      <SidebarContent className="md:bg-transparent bg-[#3f788a]">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="gap-5">

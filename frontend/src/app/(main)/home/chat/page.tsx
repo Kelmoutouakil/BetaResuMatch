@@ -8,10 +8,9 @@ import { useEffect } from "react";
 import { useRecruiter } from "@/Context/RecruiterContext";
 import { Button } from "@/components/ui/button";
 import { StatisticsDialog } from "@/components/statisticts";
-import { useRouter } from "next/navigation";
 interface Candidate {
   name: string;
-  title: string;
+  jobtitle: string;
   score: string;
   ExtractSkills: string;
   MatchedSkills: string;
@@ -67,7 +66,7 @@ export default function Home() {
   return (
     <main className="size-full">
       <div className="mb-10">
-        <SearchBar setCandidates={setCandidates} />
+        <SearchBar  candidates={candidates} setCandidates={setCandidates} />
       </div>
 
       <div className="w-full h-fit flex justify-between ">

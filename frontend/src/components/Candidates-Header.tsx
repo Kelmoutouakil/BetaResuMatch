@@ -5,7 +5,7 @@ import api from "@/lib/axiosInstance";
 import { Loader, X } from "lucide-react";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-
+import Image from "next/image";
 interface Candidate {
   name: string;
   jobtitle: string;
@@ -80,10 +80,13 @@ export default function CandidateList() {
               <X className="w-6 h-6" />
             </button>
             <h2 className="text-xl font-semibold mb-4">Candidate Resume</h2>
-            <iframe
+            <Image
+              width={500}
+              height={500}
+              alt="Candidate Resume"
               src={backendUrl + selectedFile}
               className="w-full h-[500px] border"
-            ></iframe>
+            ></Image>
           </div>
         </div>
       )}

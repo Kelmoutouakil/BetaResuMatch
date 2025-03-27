@@ -48,7 +48,7 @@ export default function LoginForm() {
       console.log("Attempting login with:", { email: userData.email });
 
       const res = await axios.post(
-        "https://127.0.0.1:8000/api/token/",
+        "https://localhost:8000/api/token/",
         userData,
         {
           headers: {

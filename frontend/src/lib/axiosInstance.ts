@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://127.0.0.1:8000/api";
+const BASE_URL = "https://localhost:8000/api";
 
 const getAccessToken = () => localStorage.getItem("accessToken");
 const getRefreshToken = () => localStorage.getItem("refreshToken");

@@ -7,6 +7,7 @@ interface Candidate {
   MatchedSkills: string;
   MissingSkills: string;
   file: string;
+  feedback: string;
   summary: string;
 }
 

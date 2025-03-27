@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/axiosInstance";
 import { toast } from "sonner";
 import { useRecruiter } from "@/Context/RecruiterContext";
-import axios from "axios";
+
 export default function SearchPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("Extracting...");
   const { module, setFirstName, setLastName } = useRecruiter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,6 +23,22 @@ export default function SearchPage() {
     }
 
     setIsLoading(true);
+    let loadingStages = [
+      "Extracting job details...",
+      "Analyzing description...",
+      "Loading data...",
+      "Processing request...",
+      "Please wait..."
+    ];
+
+    let counter = 0;
+
+    const updateLoadingText = () => {
+      setLoadingText(loadingStages[counter]);
+      counter = (counter + 1) % loadingStages.length;
+    };
+
+    const loadingInterval = setInterval(updateLoadingText, 2000);
 
     try {
       console.log("searchQuery : ", module);
@@ -32,7 +49,6 @@ export default function SearchPage() {
 
       if (response.status >= 200 && response.status < 300) {
         router.push("/home/chat");
-
         toast.success("Job description uploaded successfully!");
       } else {
         toast.error(`Error: ${response.statusText}`);
@@ -40,6 +56,7 @@ export default function SearchPage() {
     } catch (error) {
       toast.error("Failed to process your request. Please try again.");
     } finally {
+      clearInterval(loadingInterval);
       setIsLoading(false);
     }
   };
@@ -88,6 +105,12 @@ export default function SearchPage() {
             </button>
           </div>
         </form>
+
+        {isLoading && (
+          <div className="mt-4 text-white text-sm animate-pulse">
+            {loadingText}
+          </div>
+        )}
       </main>
     </div>
   );

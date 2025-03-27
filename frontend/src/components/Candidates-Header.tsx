@@ -14,16 +14,17 @@ interface Candidate {
   file: string;
   summary: string;
 }
-
 export default function CandidateList() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const backendUrl = "https://localhost:8000";
 
   useEffect(() => {
     const fetchCandidates = async () => {
       setIsLoading(true);
       try {
         const response = await api.get("api/getcandidat/");
+        console.log(response.data.file);
         setCandidates(response.data);
       } catch (err) {
         const axiosError = err as AxiosError<{ message: string }>;
@@ -56,6 +57,8 @@ export default function CandidateList() {
                 <div
                   key={index}
                   className="py-5 px-8 border-b border-gray-500 cursor-pointer transition-colors w-full"
+                  onClick={() => {console.log("hnaaa",candidate.file);
+                    window.open(backendUrl + candidate.file)}}
                 >
                   <div className="text-black text-md font-medium">
                     {candidate.name}

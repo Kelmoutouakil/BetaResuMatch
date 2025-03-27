@@ -56,6 +56,7 @@ export default function SearchBar({
             extractedSkills.includes(query) || matchedSkills.includes(query)
           );
         } else if (filterType === "job") {
+          console.log("Job Title:", candidate.jobtitle);
           return candidate.jobtitle?.toLowerCase().includes(query);
         }
         return false;

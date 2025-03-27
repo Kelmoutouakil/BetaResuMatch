@@ -3,7 +3,13 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function LandingPage() {
-
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("crf");
+    localStorage.removeItem("first_name");
+    localStorage.removeItem("last_name");
+  }
   const RequestCrf = async() =>{
 
     fetch("https://127.0.0.1:8000/user/getcsrf/",{

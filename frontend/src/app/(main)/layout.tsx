@@ -20,6 +20,7 @@ export default function SidebarLayout({
     const fetchData = async () => {
       try {
         const res = await api.get("user/getUser");
+        console.log("wewewe",res.data);
         const firstName = res.data.first_name;
         const lastName = res.data.last_name;
 
@@ -37,7 +38,7 @@ export default function SidebarLayout({
     };
 
     fetchData();
-  }, [setFirstName, setLastName]);
+  }, []);
   return (
     <div className="flex min-h-screen w-full overflow-hidden flex-col">
       <div className="flex flex-1">

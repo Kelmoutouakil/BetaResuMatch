@@ -1,12 +1,13 @@
-![architecture](https://github.com/user-attachments/assets/30e7e111-8f02-46ab-b3c4-0e5b5224686d)
-# BETA Hiring AI
 
-**AI-Powered Applicant Tracking System (ATS) for Smarter, Faster Hiring**
+# BETA Hiring AI
+**AI-Powered Applicant Tracking System (ATS) for Smarter, Faster Hiring!**  
+
+![architecture](https://github.com/user-attachments/assets/30e7e111-8f02-46ab-b3c4-0e5b5224686d)
+
 
 ## Table of Contents
 - [Overview](#overview)
 - [Key Features](#key-features)
-- [System Architecture](#system-architecture)
 
 ## Overview
 **BETA** is an AI-powered Applicant Tracking System (ATS) designed to streamline and optimize the hiring process. By leveraging advanced AI, BETA automates time-consuming tasks, enhances candidate matching, and provides data-driven insights to help recruiters make smarter hiring decisions.
@@ -23,5 +24,5 @@
 - Top Universities/Schools & job titles: See which institutions produce the most applicants.  
 - Common Job Titles: Identify recurring roles in your candidate pool.
 
-## System Architecture:
-![BETA Hiring AI Architecture](images/architecture.png "System Design")
+Happy hiring! ✨
+

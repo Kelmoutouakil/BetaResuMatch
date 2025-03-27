@@ -31,7 +31,7 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
     file,
     summary,
   } = candidate;
-  const backendUrl = "http://localhost:8000";
+  const backendUrl = "https://localhost";
   const ExtraformattedString = ExtractSkills.replace(/'/g, '"');
   const MissingformattedString = MissingSkills.replace(/'/g, '"');
   const MatchedformattedString = MatchedSkills.replace(/'/g, '"');

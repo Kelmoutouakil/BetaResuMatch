@@ -9,9 +9,9 @@ interface Candidate {
   name: string;
   jobtitle: string;
   score: string;
-  ExtractSkills: string;
-  MatchedSkills: string;
-  MissingSkills: string;
+  ExtractSkills: string | null;
+  MatchedSkills: string | null;
+  MissingSkills: string | null;
   file: string;
   summary: string;
   feedback: string;
@@ -34,17 +34,26 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
     feedback,
   } = candidate;
   const backendUrl = "https://localhost:8000";
-  const ExtraformattedString = ExtractSkills.replace(/'/g, '"');
-  const MissingformattedString = MissingSkills.replace(/'/g, '"');
-  const MatchedformattedString = MatchedSkills.replace(/'/g, '"');
 
+  // Protect against null or undefined fields
+  const ExtraformattedString = ExtractSkills
+    ? ExtractSkills.replace(/'/g, '"')
+    : "[]";
+  const MissingformattedString = MissingSkills
+    ? MissingSkills.replace(/'/g, '"')
+    : "[]";
+  const MatchedformattedString = MatchedSkills
+    ? MatchedSkills.replace(/'/g, '"')
+    : "[]";
+
+  // Parse the strings into arrays
   const ExtraskillsArray = JSON.parse(ExtraformattedString);
   const MissingskillsArray = JSON.parse(MissingformattedString);
   const MatchedskillsArray = JSON.parse(MatchedformattedString);
-  
 
   const [openFeedback, setOpenFeedback] = useState(false);
   const [currectScore, setCurrentScore] = useState(score);
+
   return (
     <div className="size-full overflow-y-scroll">
       <div className="text-black rounded-md max-h-screen flex flex-col relative">
@@ -91,7 +100,7 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
                   </li>
                 ))
               ) : (
-                <li>No matched skills available</li>
+                <li>No missing skills available</li>
               )}
             </ul>
           </div>
@@ -107,7 +116,7 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
                   </li>
                 ))
               ) : (
-                <li>No matched skills available</li>
+                <li>No extra skills available</li>
               )}
             </ul>
           </div>

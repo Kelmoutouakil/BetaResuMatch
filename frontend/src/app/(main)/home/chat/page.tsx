@@ -91,8 +91,8 @@ export default function Home() {
           ))}
         </div>
       ) : (
-        <div className="flex text-center text-gray-500 py-10">
-          No candidates found, Upload REsumes and write the job description to
+        <div className="flex text-center text-gray-500 py-10 w-full">
+          No candidates found, Upload Resumes and write the job description to
           get started
         </div>
       )}

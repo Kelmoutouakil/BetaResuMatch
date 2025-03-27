@@ -32,7 +32,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is where `collectsta
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # Include your custom static files here
 ]
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 MEDIA_URL = '/media/'  # URL to access files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -159,11 +159,36 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 # CORS Settings
-CORS_ALLOW_ALL_ORIGINS = False  # Set to True if you want to allow all origins (for testing only)
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Allow your frontend
-    "http://127.0.0.1:3000",  # Alternative localhost
+CORS_ALLOW_ALL_ORIGINS = True
+
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1"
 ]
-CORS_ALLOW_CREDENTIALS = True  # If you're using authentication with cookies or tokens
-CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-CORS_ALLOW_HEADERS = ["*"]  # Allow all headers
+
+CORS_ALLOWED_ORIGINS = [
+    "https://localhost",
+    "https://127.0.0.1",
+]
+
+
+CSRF_TRUSTED_ORIGINS =  [
+    "https://localhost",
+    "https://127.0.0.1",
+    
+]
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+]
+
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-csrftoken',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+ROOT_URLCONF = 'project.urls'

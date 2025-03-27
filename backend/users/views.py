@@ -13,7 +13,6 @@ from rest_framework.decorators import api_view, permission_classes
 
 @api_view(['POST'])
 def CreateUser(request):
-    print("request :",request.body,flush=True)
     form = UserRegistationForm(json.loads(request.body))
     if form.is_valid():
         first_name = form.cleaned_data['first_name']

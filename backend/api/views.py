@@ -22,7 +22,6 @@ def Upload(request):
     if request.FILES.get('files'):
         uploaded_files = request.FILES.getlist('files')
         for file in uploaded_files:
-            print("f------file",file,flush=True)
             filename, ext = os.path.splitext(file.name)
             if ext.lower() != '.pdf':
                 return JsonResponse({'error': f'Invalid file type: {ext}'})
@@ -86,6 +85,8 @@ def JDupload(request):
                 resume.ExtractSkills = extracted_skills["extra_skills"]
                 resume.save()
                 score = match_resume_to_jd(text, data.get('job_description'))
+                if int(score) < 0:
+                    score = 0
                 resume.score = score
                 resume.save()
 

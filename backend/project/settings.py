@@ -23,13 +23,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY') 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+STATIC_URL = 'static/'
 
+# Directory where static files will be collected for production use
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is where `collectstatic` will put all files
+
+# List of directories where Django will look for additional static files (including admin files)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Include your custom static files here
+]
 ALLOWED_HOSTS = []
 
 MEDIA_URL = '/media/'  # URL to access files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
-APPEND_SLASH = True
+# APPEND_SLASH = True
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

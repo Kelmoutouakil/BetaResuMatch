@@ -2,6 +2,7 @@
 # chown -R postgres:postgres /etc/postgresql/15/main
 # chown -R postgres:postgres /var/log/postgresql
 # service postgresql start && \
+ls -la /etc/certs
 service postgresql start
 
 sleep 5 
@@ -21,4 +22,4 @@ python manage.py makemigrations
 
 python manage.py migrate 
 
-python manage.py runserver 0.0.0.0:8000
+hypercorn  project.asgi:application --bind 0.0.0.0:443 --certfile /etc/certs/crt.crt --keyfile /etc/certs/key.key

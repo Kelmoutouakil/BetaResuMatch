@@ -37,7 +37,6 @@ export default function Home() {
       setIsLoading(true);
       try {
         const response = await api.get("api/Rank");
-        console.log("response : ", response.data);
         setCandidates(response.data);
       } catch (err: any) {
         toast.error(err.response?.data?.message || "Something went wrong!");
@@ -55,7 +54,6 @@ export default function Home() {
   const handleClick = async () => {
     try {
       const response = await api.get("api/dashbord/");
-      console.log("response : ", response.data);
       setStatisticsData(response.data);
       setStatisticsOpen(true);
       toast.success("Statistics generated successfully");

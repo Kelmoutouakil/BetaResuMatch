@@ -83,20 +83,20 @@ export default function FeedBackDialog({
         </DialogHeader>
         <div className="p-6 gap-5 flex flex-col">
           <Label htmlFor="score">Edit score</Label>
-          <Input
+          <input
             id="score"
             type="number"
             placeholder="Enter the rating"
-            className="w-full"
+            className="w-full border-2 h-[50px] p-3 rounded-xl"
             value={score}
             onChange={(e) => setScore(e.target.value)}
           />
           <Label htmlFor="feedback">Give feedback</Label>
-          <Input
+          <input
             id="feedback"
             type="text"
             placeholder={candidate.feedback}
-            className="w-full h-[100px]"
+            className="w-full h-[100px] border-2 p-3 rounded-xl"
             value={candidate.feedback}
             onChange={(e) => setFeedback(e.target.value)}
           />

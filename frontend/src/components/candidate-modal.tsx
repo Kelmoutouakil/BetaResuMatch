@@ -32,15 +32,29 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
     summary,
   } = candidate;
   const backendUrl = "https://localhost";
-  const ExtraformattedString = ExtractSkills.replace(/'/g, '"');
-  const MissingformattedString = MissingSkills.replace(/'/g, '"');
-  const MatchedformattedString = MatchedSkills.replace(/'/g, '"');
+  // const ExtraformattedString = ExtractSkills.replace(/'/g, '"');
+  // const MissingformattedString = MissingSkills.replace(/'/g, '"');
+  // const MatchedformattedString = MatchedSkills.replace(/'/g, '"');
 
 
-  const ExtraskillsArray = JSON.parse(ExtraformattedString);
-  const MissingskillsArray = JSON.parse(MissingformattedString);
-  const MatchedskillsArray = JSON.parse(MatchedformattedString);
+  // const ExtraskillsArray = JSON.parse(ExtraformattedString);
+  // const MissingskillsArray = JSON.parse(MissingformattedString);
+  // const MatchedskillsArray = JSON.parse(MatchedformattedString);
+  const ExtraformattedString = (ExtractSkills ?? "").replace(/'/g, '"');
+  const MissingformattedString = (MissingSkills ?? "").replace(/'/g, '"');
+  const MatchedformattedString = (MatchedSkills ?? "").replace(/'/g, '"');
 
+  let ExtraskillsArray = [];
+  let MissingskillsArray = [];
+  let MatchedskillsArray = [];
+
+  try {
+    ExtraskillsArray = JSON.parse(ExtraformattedString || "[]");
+    MissingskillsArray = JSON.parse(MissingformattedString || "[]");
+    MatchedskillsArray = JSON.parse(MatchedformattedString || "[]");
+  } catch (error) {
+    console.error("Error parsing skill strings:", error);
+  }
   const [openFeedback, setOpenFeedback] = useState(false);
 
   return (

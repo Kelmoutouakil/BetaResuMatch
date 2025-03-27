@@ -11,9 +11,10 @@ interface Candidate {
   jobtitle: string;
   Instutut_name: string;
   desired_role: string;
-  file: string; // URL of the PDF file
+  file: string;
   summary: string;
 }
+const backendUrl = "http://localhost:8000";
 
 export default function CandidateList() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -41,7 +42,6 @@ export default function CandidateList() {
 
   return (
     <div className="flex h-fit">
-      {/* Left panel - Candidate list */}
       <div className="w-full">
         <div className="relative">
           {isLoading ? (
@@ -57,10 +57,10 @@ export default function CandidateList() {
               {candidates.map((candidate, index) => (
                 <div
                   key={index}
-                  className="py-5 px-8 border-b border-gray-500 cursor-pointer transition-colors"
+                  className="py-5 px-8 border-b border-gray-500 cursor-pointer transition-colors w-full"
                   onClick={() => setSelectedFile(candidate.file)}
                 >
-                  <div className="text-black text-lg font-medium">
+                  <div className="text-black text-md font-medium">
                     {candidate.name}
                   </div>
                 </div>
@@ -81,7 +81,7 @@ export default function CandidateList() {
             </button>
             <h2 className="text-xl font-semibold mb-4">Candidate Resume</h2>
             <iframe
-              src={"http://127.0.0.1:9000/" + selectedFile}
+              src={backendUrl + selectedFile}
               className="w-full h-[500px] border"
             ></iframe>
           </div>

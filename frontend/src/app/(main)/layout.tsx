@@ -3,7 +3,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { useRecruiter } from "@/Context/RecruiterContext";
-import { User } from "iconsax-react";
 export default function SidebarLayout({
   children,
 }: Readonly<{
@@ -15,10 +14,10 @@ export default function SidebarLayout({
       <div className="flex flex-1">
         <SidebarProvider>
           <AppSidebar />
-          <main className="">
+          <main className="flex-1 ">
             <div className="size-full p-4 items-start flex flex-col justify-start">
               <div className="w-full h-fit flex items-center justify-between py-3">
-                <SidebarTrigger className="" />
+                <SidebarTrigger />
                 <Avatar className="size-[40px]">
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>

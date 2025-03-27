@@ -90,7 +90,7 @@ export default function ResumeViewer() {
           "Content-Type": "multipart/form-data",
         },
       });
-      toast.success("Files uploaded successfully");
+      toast.success("Files uploaded successfully, Refresh the page to see the changes");
       setOpen(false);
     } catch (err: any) {
       toast.error("Can't upload files");

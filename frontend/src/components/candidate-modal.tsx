@@ -35,7 +35,6 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
   } = candidate;
   const backendUrl = "https://localhost:8000";
 
-  // Protect against null or undefined fields
   const ExtraformattedString = ExtractSkills
     ? ExtractSkills.replace(/'/g, '"')
     : "[]";
@@ -46,7 +45,6 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
     ? MatchedSkills.replace(/'/g, '"')
     : "[]";
 
-  // Parse the strings into arrays
   const ExtraskillsArray = JSON.parse(ExtraformattedString);
   const MissingskillsArray = JSON.parse(MissingformattedString);
   const MatchedskillsArray = JSON.parse(MatchedformattedString);

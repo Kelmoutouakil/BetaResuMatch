@@ -31,13 +31,7 @@ def CreateUser(request):
         return JsonResponse({"data" : "user created"})
     return JsonResponse({"error": form.errors}, status=400)
 
-def PostFile(request):
-    return render(request,'login.html')
-def pdfinput(request):
-    # return render(request,'pdfinput.html')
-    return render(request,'jd.html')
-def Postregister(request):
-    return render(request,'register.html')
+
 @api_view(['Get'])
 @permission_classes([IsAuthenticated])
 def getuser(request):

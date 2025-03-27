@@ -10,9 +10,11 @@ from .pinecone_integr import embedding_model, index
 import uuid
 from users.models import Resume
 import requests
+
 repo_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 client = InferenceClient(model=repo_id, token=os.getenv('HUGGINGFACE_API_KEY'))
+
 def extract_text(uploaded_file):
     if  not uploaded_file or not uploaded_file.name.endswith('.pdf'):
         return JsonResponse({'error':"file not found or format not supported"})

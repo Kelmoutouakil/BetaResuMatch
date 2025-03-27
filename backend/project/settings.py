@@ -25,19 +25,17 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = True
 STATIC_URL = 'static/'
 
-# Directory where static files will be collected for production use
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is where `collectstatic` will put all files
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  
 
-# List of directories where Django will look for additional static files (including admin files)
+
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Include your custom static files here
+    os.path.join(BASE_DIR, 'static'),  
 ]
-# ALLOWED_HOSTS = []
 
-MEDIA_URL = '/media/'  # URL to access files
+
+MEDIA_URL = '/media/'  
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# Application definition
-# APPEND_SLASH = True
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -103,8 +101,6 @@ print(f"DB_NAME: {os.getenv('DB_NAME')}")
 print(f"DB_USER: {os.getenv('DB_USER')}")
 print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -112,14 +108,11 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',  # PostgreSQL is inside the same container
+        'HOST': 'localhost',  
         'PORT': '5432',
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -137,8 +130,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -149,16 +140,13 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
 STATIC_URL = 'static/'
 
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 AUTH_USER_MODEL = 'users.User'
-# CORS Settings
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 ALLOWED_HOSTS = [

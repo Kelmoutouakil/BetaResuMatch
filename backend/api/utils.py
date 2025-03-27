@@ -9,7 +9,7 @@ import os, re, time
 from .pinecone_integr import embedding_model, index
 import uuid
 from users.models import Resume
-
+import requests
 repo_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 client = InferenceClient(model=repo_id, token=os.getenv('HUGGINGFACE_API_KEY'))
@@ -245,7 +245,7 @@ def summarize_text(text):
     try:
         response = client.text_generation(prompt)
         return response
-    except HfHubHTTPError as e:
+    except requests.exceptions.RequestException as e:
         return None
 
 def rank_candidates(jd_embedding, exclude_id=None,n=20):

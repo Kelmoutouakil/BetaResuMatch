@@ -5,7 +5,7 @@ import api from "@/lib/axiosInstance";
 import { Loader, X } from "lucide-react";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-import Image from "next/image";
+
 interface Candidate {
   name: string;
   jobtitle: string;
@@ -14,18 +14,16 @@ interface Candidate {
   file: string;
   summary: string;
 }
-const backendUrl = "https://localhost:8000";
 
 export default function CandidateList() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCandidates = async () => {
       setIsLoading(true);
       try {
-        const response = await api.get("getcandidat/");
+        const response = await api.get("api/getcandidat/");
         setCandidates(response.data);
       } catch (err) {
         const axiosError = err as AxiosError<{ message: string }>;
@@ -58,7 +56,6 @@ export default function CandidateList() {
                 <div
                   key={index}
                   className="py-5 px-8 border-b border-gray-500 cursor-pointer transition-colors w-full"
-                  onClick={() => setSelectedFile(candidate.file)}
                 >
                   <div className="text-black text-md font-medium">
                     {candidate.name}
@@ -69,27 +66,6 @@ export default function CandidateList() {
           )}
         </div>
       </div>
-
-      {selectedFile && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full relative">
-            <button
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-              onClick={() => setSelectedFile(null)}
-            >
-              <X className="w-6 h-6" />
-            </button>
-            <h2 className="text-xl font-semibold mb-4">Candidate Resume</h2>
-            <Image
-              width={500}
-              height={500}
-              alt="Candidate Resume"
-              src={backendUrl + selectedFile}
-              className="w-full h-[500px] border"
-            ></Image>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

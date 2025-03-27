@@ -29,9 +29,7 @@ export const RecruiterProvider = ({ children }: { children: ReactNode }) => {
     const storedLastName = localStorage.getItem("last_name");
     const storedIsSigned = Cookies.get("isSigned");
     const storedAccessToken = localStorage.getItem("accessToken");
-
-    if (storedFirstName) setFirstName(storedFirstName);
-    if (storedLastName) setLastName(storedLastName);
+    
     if (storedIsSigned) setIsSigned(storedIsSigned === "true");
     if (storedAccessToken) setAccessToken(storedAccessToken);
   }, []);

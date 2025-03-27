@@ -1,5 +1,4 @@
 "use client";
-
 import type React from "react";
 import { useState, useEffect } from "react";
 import { Search, ArrowRight, Loader } from "lucide-react";
@@ -7,11 +6,12 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/axiosInstance";
 import { toast } from "sonner";
 import { useRecruiter } from "@/Context/RecruiterContext";
+import axios from "axios";
 export default function SearchPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { module } = useRecruiter();
+  const { module, setFirstName, setLastName } = useRecruiter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +25,7 @@ export default function SearchPage() {
 
     try {
       console.log("searchQuery : ", module);
-      const response = await api.post("JDupload/", {
+      const response = await api.post("api/JDupload/", {
         job_description: searchQuery,
         model: module,
       });

@@ -1,14 +1,43 @@
-"use client"; // Ensure this component is client-side
+"use client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { useRecruiter } from "@/Context/RecruiterContext";
+import { useEffect } from "react";
+import api from "@/lib/axiosInstance";
+import { toast } from "sonner";
+import { useState } from "react";
+
 export default function SidebarLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { firstName, lastName } = useRecruiter();
+  const { setFirstName, setLastName } = useRecruiter();
+  const [initials, setInitials] = useState<string>("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await api.get("user/getUser");
+        const firstName = res.data.first_name;
+        const lastName = res.data.last_name;
+
+        setFirstName(firstName);
+        setLastName(lastName);
+        localStorage.setItem("first_name", firstName);
+        localStorage.setItem("last_name", lastName);
+
+        const firstLetter = firstName.charAt(0).toUpperCase();
+        const lastLetter = lastName.charAt(0).toUpperCase();
+        setInitials(`${firstLetter}${lastLetter}`);
+      } catch (err) {
+        toast.error("Failed to get user data");
+      }
+    };
+
+    fetchData();
+  }, [setFirstName, setLastName]);
   return (
     <div className="flex min-h-screen w-full overflow-hidden flex-col">
       <div className="flex flex-1">
@@ -19,7 +48,7 @@ export default function SidebarLayout({
               <div className="w-full h-fit flex items-center justify-between py-3">
                 <SidebarTrigger />
                 <Avatar className="size-[40px]">
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
               </div>
 

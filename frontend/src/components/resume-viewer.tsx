@@ -85,7 +85,7 @@ export default function ResumeViewer() {
       for (let i = 0; i < resumes.length; i++) {
         formData.append("files", resumes[i]);
       }
-      await api.post("upload/", formData, {
+      await api.post("api/upload/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

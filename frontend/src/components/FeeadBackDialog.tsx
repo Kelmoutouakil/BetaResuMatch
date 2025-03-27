@@ -10,24 +10,27 @@ import { Input } from "./ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import api from "@/lib/axiosInstance";
 
 interface Candidate {
   name: string;
   file: string;
+  feedback: string;
 }
 interface StatisticsDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   candidate: Candidate;
+  setCurrentScore: (score: string) => void;
 }
 
 export default function FeedBackDialog({
   open,
   setOpen,
   candidate,
+  setCurrentScore,
 }: StatisticsDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [score, setScore] = useState("");
@@ -43,17 +46,18 @@ export default function FeedBackDialog({
 
     try {
       if (score.trim()) {
-        await api.post("/update/", {
+        await api.post("api/update/", {
           name: candidate.name,
           file: candidate.file,
           score: score,
         });
+        setCurrentScore(score);
         toast.success("Score updated successfully!");
       }
 
       if (feedback.trim()) {
         console.log("feedback : ", feedback);
-        await api.post("/feedback/", {
+        const res = await api.post("api/feedback/", {
           name: candidate.name,
           file: candidate.file,
           feedback: feedback,
@@ -91,9 +95,9 @@ export default function FeedBackDialog({
           <Input
             id="feedback"
             type="text"
-            placeholder="Enter the feedback"
+            placeholder={candidate.feedback}
             className="w-full h-[100px]"
-            value={feedback}
+            value={candidate.feedback}
             onChange={(e) => setFeedback(e.target.value)}
           />
         </div>

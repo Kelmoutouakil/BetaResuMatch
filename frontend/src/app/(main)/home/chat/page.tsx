@@ -17,6 +17,7 @@ interface Candidate {
   MissingSkills: string;
   file: string;
   summary: string;
+  feedback: string;
 }
 interface StatisticsData {
   school_data: Record<string, number>;
@@ -35,7 +36,7 @@ export default function Home() {
     const sendQuery = async () => {
       setIsLoading(true);
       try {
-        const response = await api.get("/Rank");
+        const response = await api.get("api/Rank");
         console.log("response : ", response.data);
         setCandidates(response.data);
       } catch (err: any) {
@@ -53,7 +54,7 @@ export default function Home() {
 
   const handleClick = async () => {
     try {
-      const response = await api.get("dashbord/");
+      const response = await api.get("api/dashbord/");
       console.log("response : ", response.data);
       setStatisticsData(response.data);
       setStatisticsOpen(true);

@@ -14,6 +14,7 @@ interface Candidate {
   MissingSkills: string;
   file: string;
   summary: string;
+  feedback: string;
 }
 
 interface CandidateCardProps {
@@ -30,19 +31,20 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
     MissingSkills,
     file,
     summary,
+    feedback,
   } = candidate;
-  const backendUrl = "https://localhost";
+  const backendUrl = "https://localhost:8000";
   const ExtraformattedString = ExtractSkills.replace(/'/g, '"');
   const MissingformattedString = MissingSkills.replace(/'/g, '"');
   const MatchedformattedString = MatchedSkills.replace(/'/g, '"');
 
-
   const ExtraskillsArray = JSON.parse(ExtraformattedString);
   const MissingskillsArray = JSON.parse(MissingformattedString);
   const MatchedskillsArray = JSON.parse(MatchedformattedString);
+  
 
   const [openFeedback, setOpenFeedback] = useState(false);
-
+  const [currectScore, setCurrentScore] = useState(score);
   return (
     <div className="size-full overflow-y-scroll">
       <div className="text-black rounded-md max-h-screen flex flex-col relative">
@@ -111,7 +113,7 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
           </div>
 
           <div className="flex flex-col gap-4 justify-center mb-8">
-            <Rating score={score} />
+            <Rating score={currectScore} />
 
             <Button
               variant="outline"
@@ -136,6 +138,7 @@ export default function CandidateModal({ candidate }: CandidateCardProps) {
         open={openFeedback}
         setOpen={setOpenFeedback}
         candidate={candidate}
+        setCurrentScore={setCurrentScore}
       />
     </div>
   );

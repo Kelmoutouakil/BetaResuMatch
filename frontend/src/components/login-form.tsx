@@ -17,6 +17,7 @@ const loginSchema = z.object({
 });
 
 export default function LoginForm() {
+  const {setFirstName, setLastName} = useRecruiter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -44,8 +45,6 @@ export default function LoginForm() {
         email: formData.email,
         password: formData.password,
       };
-
-      console.log("Attempting login with:", { email: userData.email });
 
       const res = await axios.post(
         "https://localhost:8000/api/token/",

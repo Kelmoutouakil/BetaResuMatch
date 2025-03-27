@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 
 export default function CandidateCard({ candidate }: CandidateCardProps) {
-  const { name, title, score } = candidate;
+  const { name, jobtitle, score } = candidate;
   // const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <Dialog>
@@ -37,7 +37,7 @@ export default function CandidateCard({ candidate }: CandidateCardProps) {
           <h2 className="text-lg lg:text-xl font-semibold mb-1">
             {name || "Can't extract name"}
           </h2>
-          <p className="text-black/80">{title || "can't extract job title"}</p>
+          <p className="text-black/80">{jobtitle || "can't extract job title"}</p>
         </div>
       </DialogTrigger>
       <DialogContent className="w-full max-w-full lg:max-w-[500px] rounded-none lg:rounded-[11px] lg:w-[500px] h-full lg:h-fit  lg:max-h-[70vh] overflow-hidden overflow-y-scroll">

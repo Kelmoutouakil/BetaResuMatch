@@ -6,7 +6,7 @@ export default function LandingPage() {
 
   const RequestCrf = async() =>{
 
-    fetch("http://127.0.0.1:9000/user/getcsrf/",{
+    fetch("https://127.0.0.1/user/getcsrf/",{
         method: 'GET'
     })
     .then((response)=>response.json())

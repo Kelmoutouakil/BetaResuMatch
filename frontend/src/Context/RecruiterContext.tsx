@@ -24,9 +24,7 @@ export const RecruiterProvider = ({ children }: { children: ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [module, setModule] = useState<string>("1");
 
-  useEffect(() => {
-    const storedFirstName = localStorage.getItem("first_name");
-    const storedLastName = localStorage.getItem("last_name");
+  useEffect(() => {2
     const storedIsSigned = Cookies.get("isSigned");
     const storedAccessToken = localStorage.getItem("accessToken");
     

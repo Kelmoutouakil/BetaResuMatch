@@ -16,8 +16,9 @@ const Logout = () => {
   const { setIsSigned } = useRecruiter();
 
   const handleClick = () => {
-    setIsSigned(false);
-    Cookies.remove("isSigned");
+    Cookies.remove("accessToken");
+        Cookies.remove("refreshToken");
+        localStorage.removeItem("isSigned");
     window.location.href = "/auth/login";
   };
   return (

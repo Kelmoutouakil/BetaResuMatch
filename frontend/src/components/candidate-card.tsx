@@ -27,7 +27,7 @@ export default function CandidateCard({ candidate }: CandidateCardProps) {
   // const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <Dialog>
-      <DialogTrigger className=" w-full lg:w-[380px]">
+      <DialogTrigger className="w-[400px] max-w-[500px] lg:max-w-[400px] sm:w-[380px]">
         <div
           className="relative bg-[#3F788A99] text-black rounded-xl px-4 lg:px-6 py-4 lg:max-w-[380px] transition-transform hover:translate-y-[-2px] flex flex-col gap-2 items-start justify-start"
           // style={{ boxShadow: "5px 5px 17.4px rgba(0, 0, 0, 0.5)" }}

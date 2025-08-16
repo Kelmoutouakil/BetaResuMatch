@@ -66,8 +66,8 @@ export default function SearchBar({ setCandidates, candidates }: SearchBarProps)
     setSearchQuery(e.target.value)
   }
 return (
-    <div className="flex gap-4 mt-5 justify-end">
-      <Input placeholder="Search" value={searchQuery} onChange={handleInputChange} style={{ width: 300 }} />
+    <div className="flex gap-4 mt-5 justify-end pr-3">
+      <Input placeholder="Search" value={searchQuery} onChange={handleInputChange}  className="md:w-[300px]"/>
       <Select value={filterType} onValueChange={setFilterType}>
         <SelectTrigger className="w-[80px]">
           <SelectValue placeholder="Skills" />

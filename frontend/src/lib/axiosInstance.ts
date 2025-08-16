@@ -1,17 +1,21 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const BASE_URL = "https://localhost:8000/";
 
-const getAccessToken = () => localStorage.getItem("accessToken");
-const getRefreshToken = () => localStorage.getItem("refreshToken");
+// Helper functions to read from cookies
+const getAccessToken = () => Cookies.get("accessToken");
+const getRefreshToken = () => Cookies.get("refreshToken");
 
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // if backend uses cookies with httpOnly or same-site policy
 });
 
+// --- REQUEST INTERCEPTOR ---
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
@@ -23,6 +27,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// --- RESPONSE INTERCEPTOR (Handles token refresh) ---
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -35,18 +40,32 @@ api.interceptors.response.use(
         const refreshToken = getRefreshToken();
         if (!refreshToken) throw new Error("No refresh token available");
 
-        const { data } = await axios.post(`${BASE_URL}/token/`, {
-          refresh: refreshToken,
+        const { data } = await axios.post(
+          `${BASE_URL}api/token/refresh/`,
+          { refresh: refreshToken },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+
+        // Save new accessToken in cookies
+        Cookies.set("accessToken", data.access, {
+          expires: 1,
+          sameSite: "Strict",
+          secure: process.env.NODE_ENV === "production",
         });
 
-        localStorage.setItem("accessToken", data.access);
-
+        // Retry original request with new token
         originalRequest.headers.Authorization = `Bearer ${data.access}`;
         return api(originalRequest);
       } catch (refreshError) {
-        console.error("Token refresh failed", refreshError);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+        Cookies.remove("accessToken");
+        Cookies.remove("refreshToken");
+        Cookies.remove("isSigned");
+        localStorage.removeItem("isSigned");
         window.location.href = "/auth/login";
       }
     }

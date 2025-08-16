@@ -20,7 +20,6 @@ export default function SidebarLayout({
     const fetchData = async () => {
       try {
         const res = await api.get("user/getUser");
-        console.log("wewewe",res.data);
         const firstName = res.data.first_name;
         const lastName = res.data.last_name;
 
@@ -48,7 +47,7 @@ export default function SidebarLayout({
             <div className="size-full p-4 items-start flex flex-col justify-start">
               <div className="w-full h-fit flex items-center justify-between py-3">
                 <SidebarTrigger />
-                <Avatar className="size-[40px]">
+                <Avatar className="size-[40px] pr-1">
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
               </div>

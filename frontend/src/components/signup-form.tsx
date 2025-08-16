@@ -68,7 +68,6 @@ export default function SignupForm() {
         }
       );
 
-      console.log("Response:", response);
       toast.success("Signed up successfully ✅");
       localStorage.setItem("first_name", formData.firstname);
       localStorage.setItem("last_name", formData.lastname);

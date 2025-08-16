@@ -7,7 +7,7 @@ const app = next({ dev: true });
 const handle = app.getRequestHandler();
 
 const httpsOptions = {
-  key: fs.readFileSync("../conf/key.key"), // Path to your private key
+  key: fs.readFileSync("../conf/key.key"),
   cert: fs.readFileSync("../conf/crt.crt"),
 };
 

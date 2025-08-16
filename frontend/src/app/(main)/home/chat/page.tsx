@@ -63,27 +63,23 @@ export default function Home() {
   };
 
   return (
-    <main className="size-full">
-      <div className="mb-10">
+    <main className="size-full flex flex-col items-start justify-start">
+      <div className="mb-10 w-full">
         <SearchBar  candidates={candidates} setCandidates={setCandidates} />
       </div>
 
-      <div className="w-full h-fit flex justify-between ">
-        <h1 className="text-2xl font-bold text-slate-800 mb-6">Results</h1>
-        <Button
-          variant="outline"
-          className="bg-gray-200 text-gray-800 hover:bg-[#3F788A99]"
-          onClick={handleClick}
-        >
-          View statistics
-        </Button>
-      </div>
+      <div className="w-full h-fit flex flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 pr-3">
+      <h1 className="text-2xl font-bold text-slate-800 mb-6 sm:mb-0">Results</h1>
+      <Button variant="outline" className="bg-gray-200 text-gray-800 hover:bg-[#3F788A99]" onClick={handleClick}>
+        View statistics
+      </Button>
+    </div>
       {isLoading ? (
         <div className="flex justify-center items-center h-40">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#89A8B2]"></div>
         </div>
       ) : candidates.length > 0 ? (
-        <div className="flex flex-wrap items-center p-2 lg:items-start justify-center lg:justify-start  gap-x-4  w-full h-fit overflow-y-scroll gap-y-16">
+        <div className="flex flex-wrap items-center p-2 lg:items-start justify-start  gap-x-4  w-full h-fit overflow-y-scroll gap-y-16">
           {candidates.map((candidate, index) => (
             <CandidateCard key={index} candidate={candidate} />
           ))}

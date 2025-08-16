@@ -17,7 +17,7 @@ const loginSchema = z.object({
 });
 
 export default function LoginForm() {
-  const {setFirstName, setLastName} = useRecruiter();
+  const { setFirstName, setLastName } = useRecruiter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -59,13 +59,30 @@ export default function LoginForm() {
 
       const data = res.data;
 
-      localStorage.setItem("accessToken", data.access);
-      localStorage.setItem("refreshToken", data.refresh);
+      // 1. Store tokens in cookies
+      Cookies.set("accessToken", data.access, {
+        expires: 1, // 1 day
+        sameSite: "Strict",
+        secure: process.env.NODE_ENV === "production",
+      });
+
+      Cookies.set("refreshToken", data.refresh, {
+        expires: 7,
+        sameSite: "Strict",
+        secure: process.env.NODE_ENV === "production",
+      });
+
+      localStorage.setItem("isSigned", "true");
+      //set the is signed in the cookis
+      Cookies.set("isSigned", "true", {
+        expires: 1, // 1 day
+        sameSite: "Strict",
+        secure: process.env.NODE_ENV === "production",
+      });
 
       toast.success("Logged in successfully ✅");
-      setIsSigned(true);
-      Cookies.set("isSigned", "true", { expires: 1 });
       router.push("/home");
+      setIsSigned(true);
     } catch (err: any) {
       if (err instanceof z.ZodError) {
         setError(err.errors[0].message);
